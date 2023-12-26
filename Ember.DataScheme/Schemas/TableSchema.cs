@@ -1,4 +1,4 @@
-﻿using Ember.BluePrints;
+﻿using Ember.DataScheme.BluePrints;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ember.Schemas;
+namespace Ember.DataScheme.Schemas;
 
 public class TableSchema
 {

@@ -1,12 +1,16 @@
 ﻿using Ember.DataStructure.Base;
 using Ember.DataStructure.Base.DatabaseObjects;
-using Ember.Schemas;
 using Ember.Transcription;
+using Ember.DataScheme.Schemas;
 
 namespace Ember.DataStructure;
 
 public class Init
 {
+    public Init()
+    {
+        var t = 3;
+    }
     public static String Main()
     {
         DatabaseObjectScrapper Scrapper = new DatabaseObjectScrapper();

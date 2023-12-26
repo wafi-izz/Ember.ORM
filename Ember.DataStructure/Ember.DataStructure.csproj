@@ -22,7 +22,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Ember.DataAccess\Ember.DataAccess.csproj" />
-    <ProjectReference Include="..\Ember.Schema\Ember.Schema.csproj" />
     <ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
   </ItemGroup>
 

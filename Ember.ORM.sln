@@ -9,17 +9,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Prototypes", "Prototypes", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.CLI", "Ember.CLI\Ember.CLI.csproj", "{E4A3BE97-B4D0-424E-9E09-B56DE8C7B53E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember.DataAccess", "Ember.DataAccess\Ember.DataAccess.csproj", "{1111E4AA-77B0-4794-874F-F500D5B33B28}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataAccess", "Ember.DataAccess\Ember.DataAccess.csproj", "{1111E4AA-77B0-4794-874F-F500D5B33B28}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember.GUI", "Ember.GUI\Ember.GUI.csproj", "{C019095C-6A56-451B-8E60-8718B11F344E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.GUI", "Ember.GUI\Ember.GUI.csproj", "{C019095C-6A56-451B-8E60-8718B11F344E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember.API", "Ember.API\Ember.API.csproj", "{0994CD17-2A66-4DC9-8F5A-3D044A007BCE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.API", "Ember.API\Ember.API.csproj", "{0994CD17-2A66-4DC9-8F5A-3D044A007BCE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember.DataStructure", "Ember.DataStructure\Ember.DataStructure.csproj", "{EA3F59B3-7B5F-4782-B064-1F74D2C266A3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataStructure", "Ember.DataStructure\Ember.DataStructure.csproj", "{EA3F59B3-7B5F-4782-B064-1F74D2C266A3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember.Schema", "Ember.Schema\Ember.Schema.csproj", "{BEF91E9E-06CF-4033-8DFB-DD0A30103136}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataScheme", "Ember.DataScheme\Ember.DataScheme.csproj", "{BEF91E9E-06CF-4033-8DFB-DD0A30103136}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ember.Transcription", "Ember.Transcription\Ember.Transcription.csproj", "{79685D63-04FD-4AF3-972E-9C6B800FD9B8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.Transcription", "Ember.Transcription\Ember.Transcription.csproj", "{79685D63-04FD-4AF3-972E-9C6B800FD9B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

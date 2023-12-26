@@ -4,9 +4,9 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Ember.Schemas.TableSchema;
+using static Ember.DataScheme.Schemas.TableSchema;
 
-namespace Ember.Schemas;
+namespace Ember.DataScheme.Schemas;
 
 public class Schema
 {

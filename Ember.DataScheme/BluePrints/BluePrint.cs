@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ember.BluePrints;
+namespace Ember.DataScheme.BluePrints;
 
 public class BluePrint
 {
