@@ -21,6 +21,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataScheme", "Ember.D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.Transcription", "Ember.Transcription\Ember.Transcription.csproj", "{79685D63-04FD-4AF3-972E-9C6B800FD9B8}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{54FBB21B-9BE5-4E2A-B40B-08E3AD839CBF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Template.DataStructure", "Template.DataStructure\Template.DataStructure.csproj", "{7708D298-6224-4B6F-B6B5-863429C16846}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -55,6 +59,10 @@ Global
 		{79685D63-04FD-4AF3-972E-9C6B800FD9B8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79685D63-04FD-4AF3-972E-9C6B800FD9B8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79685D63-04FD-4AF3-972E-9C6B800FD9B8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7708D298-6224-4B6F-B6B5-863429C16846}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7708D298-6224-4B6F-B6B5-863429C16846}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7708D298-6224-4B6F-B6B5-863429C16846}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7708D298-6224-4B6F-B6B5-863429C16846}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -63,6 +71,7 @@ Global
 		{E4A3BE97-B4D0-424E-9E09-B56DE8C7B53E} = {D8CEE4E0-F434-4066-B2BF-0832AD6DB6BC}
 		{C019095C-6A56-451B-8E60-8718B11F344E} = {D8CEE4E0-F434-4066-B2BF-0832AD6DB6BC}
 		{0994CD17-2A66-4DC9-8F5A-3D044A007BCE} = {9024CA80-F1E4-4E2A-9754-A6DA9BAF7E40}
+		{7708D298-6224-4B6F-B6B5-863429C16846} = {54FBB21B-9BE5-4E2A-B40B-08E3AD839CBF}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5F8C9AD0-656B-4760-A9B6-E72F0B81531C}

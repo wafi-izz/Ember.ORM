@@ -1,0 +1,43 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageIcon>content/templates/Icon.png</PackageIcon>
+		<PackageReadmeFile>content/templates/README.md</PackageReadmeFile>
+		
+		<PackageId>Ember.DataStructure</PackageId>
+		<PackageVersion>1.0.0</PackageVersion>
+		<Title>Ember DataStructure</Title>
+		<Authors>Wafi Izz</Authors>
+		<Description>Database DataStructure File</Description>
+		<PackageTags>dotnet;</PackageTags>
+		<PackageProjectUrl>https://github.com/wafi-izz</PackageProjectUrl>
+
+		<PackageType>Template</PackageType>
+		<TargetFramework>net8.0</TargetFramework>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<ContentTargetFolders>content</ContentTargetFolders>
+		<NoWarn>$(NoWarn);NU5128</NoWarn>
+		<NoDefaultExcludes>true</NoDefaultExcludes>
+
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Content Include="templates\**\*" Exclude="templates\**\bin\**;templates\**\obj\**" />
+		<Compile Remove=" ** \*" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="templates\COC.md" />
+	  <None Remove="templates\Icon.png" />
+	  <None Remove="templates\LICENSE" />
+	  <None Remove="templates\README.md" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
+	</ItemGroup>
+
+</Project>
