@@ -1,28 +1,43 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>net8.0</TargetFramework>
-    <ImplicitUsings>enable</ImplicitUsings>
-    <Nullable>enable</Nullable>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 
-  <ItemGroup>
-    <PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-  </ItemGroup>
+		<PackageType>Template</PackageType>
+		<PackageId>ccc2</PackageId>
+		<PackageVersion>1.0.0</PackageVersion>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<TemplateName>cccd</TemplateName>
+		<ContentTargetFolders>content</ContentTargetFolders>
 
-  <ItemGroup>
-    <Folder Include="Migrations\M_01_DataTypes\" />
-  </ItemGroup>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Include="..\ConnectionStrings.config" Link="ConnectionStrings.config">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+	  <Content Include=".template.config\template.json" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Ember.DataAccess\Ember.DataAccess.csproj" />
-    <ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<Folder Include="Migrations\M_01_DataTypes\" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="..\ConnectionStrings.config" Link="ConnectionStrings.config">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</None>
+		<None Include=".template.config\template.json" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\Ember.DataAccess\Ember.DataAccess.csproj" />
+		<ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
+	</ItemGroup>
 
 </Project>

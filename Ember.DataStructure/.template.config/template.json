@@ -1,0 +1,15 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Wafi",
+  "classifications": [ "Web", "MVC" ],
+  "identity": "My. Custom. Template.json",
+  "name": "My custom template json",
+  "desciption": "This is my special description for my template",
+  "shortName": "cccjson",
+  "sourceName": "cccjson",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": true
+}
