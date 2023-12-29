@@ -1,4 +1,4 @@
-﻿using templates.Base.DatabaseObjects;
+﻿using Ember.DataStructure.Base.DatabaseObjects;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;

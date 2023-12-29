@@ -7,7 +7,7 @@
 		<PackageReadmeFile>content/templates/README.md</PackageReadmeFile>
 		
 		<PackageId>Ember.DataStructure</PackageId>
-		<PackageVersion>1.0.0</PackageVersion>
+		<PackageVersion>1.0.1</PackageVersion>
 		<Title>Ember DataStructure</Title>
 		<Authors>Wafi Izz</Authors>
 		<Description>Database DataStructure File</Description>

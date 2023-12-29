@@ -1,0 +1,21 @@
+{
+  "$schema": "http://json.schemastore.org/template",
+  "author": "Wafi Izz",
+  "defaultName": "Data.Structure",
+  "repository": {
+    "url": "https://github.com/wafi-izz",
+    "type": "GitHub"
+  },
+  "projectURL": "https://github.com/wafi-izz",
+  "releaseNotes": "init",
+  "classifications": [ "Database" ],
+  "identity": "Ember.DataStructure",
+  "name": "Ember DataStructure",
+  "shortName": "Ember.DataStructure",
+  "sourceName": "Ember.DataStructure",
+  "tags": {
+    "language": "C#",
+    "type": "project"
+  },
+  "preferNameDirectory": true
+}

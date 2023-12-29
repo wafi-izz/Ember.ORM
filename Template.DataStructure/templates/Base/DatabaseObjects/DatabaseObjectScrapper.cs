@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace templates.Base.DatabaseObjects;
+namespace Ember.DataStructure.Base.DatabaseObjects;
 
 public class DatabaseObjectScrapper
 {

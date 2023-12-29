@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace templates.Base;
+namespace Ember.DataStructure.Base;
 
 internal interface IMigratablesDictionary
 {
