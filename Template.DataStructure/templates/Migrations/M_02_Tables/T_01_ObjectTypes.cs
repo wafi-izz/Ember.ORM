@@ -1,6 +1,6 @@
 ﻿using DataStructure.Base.DatabaseObjects;
 using Ember.DataStructure.Base;
-using Ember.DataScheme.Schemas;
+using Ember.DataSchemaManager.DataSchemas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +12,7 @@ namespace Ember.DataStructure.Migrations.M_02_Tables;
 public class T_01_ObjectTypes : Table, IMigratablesDictionary
 {
     public String TableName { get; set; }
-    public Schema Schema { get; set; }
+    public DataSchema Schema { get; set; }
     public T_01_ObjectTypes()
     {
         TableName = ExtractObjectName(this.GetType().Name);

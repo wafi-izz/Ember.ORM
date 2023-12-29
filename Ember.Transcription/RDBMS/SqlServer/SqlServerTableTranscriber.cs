@@ -1,5 +1,5 @@
-﻿using Ember.DataScheme.BluePrints;
-using Ember.DataScheme.Schemas;
+﻿using Ember.DataSchemaManager.BluePrints;
+using Ember.DataSchemaManager.DataSchemas;
 using Ember.Transcription.TranscriptionInterfaces;
 using System;
 using System.Collections.Generic;

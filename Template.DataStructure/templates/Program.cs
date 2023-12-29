@@ -1,7 +1,7 @@
 ﻿using Ember.DataStructure.Base;
 using Ember.DataStructure.Base.DatabaseObjects;
 using Ember.Transcription;
-using Ember.DataScheme.Schemas;
+using Ember.DataSchemaManager.DataSchemas;
 using System;
 using System.Linq;
 
@@ -16,7 +16,7 @@ public class Init
     public static String Main()
     {
         DatabaseObjectScrapper Scrapper = new DatabaseObjectScrapper();
-        Schema Schema = new Schema(Scrapper.TableList);
+        DataSchema Schema = new DataSchema(Scrapper.TableList);
 
         var MigrationTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())

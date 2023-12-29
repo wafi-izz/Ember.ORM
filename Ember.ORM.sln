@@ -17,13 +17,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.API", "Ember.API\Embe
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataStructure", "Ember.DataStructure\Ember.DataStructure.csproj", "{EA3F59B3-7B5F-4782-B064-1F74D2C266A3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataScheme", "Ember.DataScheme\Ember.DataScheme.csproj", "{BEF91E9E-06CF-4033-8DFB-DD0A30103136}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.DataSchemaManager", "Ember.DataSchemaManager\Ember.DataSchemaManager.csproj", "{BEF91E9E-06CF-4033-8DFB-DD0A30103136}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ember.Transcription", "Ember.Transcription\Ember.Transcription.csproj", "{79685D63-04FD-4AF3-972E-9C6B800FD9B8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Templates", "Templates", "{54FBB21B-9BE5-4E2A-B40B-08E3AD839CBF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Template.DataStructure", "Template.DataStructure\Template.DataStructure.csproj", "{7708D298-6224-4B6F-B6B5-863429C16846}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Template.DataStructure", "Template.DataStructure\Template.DataStructure.csproj", "{7708D298-6224-4B6F-B6B5-863429C16846}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

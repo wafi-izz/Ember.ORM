@@ -1,4 +1,4 @@
-﻿using Ember.DataScheme.BluePrints;
+﻿using Ember.DataSchemaManager.BluePrints;
 using System;
 using System.Collections.Generic;
 using System.Linq;

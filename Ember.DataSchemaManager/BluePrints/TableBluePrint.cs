@@ -5,7 +5,7 @@ using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 
-namespace Ember.DataScheme.BluePrints;
+namespace Ember.DataSchemaManager.BluePrints;
 
 
 public class TableBluePrint : BluePrint

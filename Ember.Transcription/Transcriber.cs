@@ -4,16 +4,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Ember.DataScheme.Schemas;
+using Ember.DataSchemaManager.DataSchemas;
 
 namespace Ember.Transcription;
 
 public class Transcriber
 {
-    public Schema Schema { get; set; }
+    public DataSchema Schema { get; set; }
     public SqlTypeEnum ActiveSQL { get; set; }
     public SqlServerTranscriber SqlServer { get; set; }
-    public Transcriber(Schema Schema, SqlTypeEnum ActiveSQL)
+    public Transcriber(DataSchema Schema, SqlTypeEnum ActiveSQL)
     {
         this.Schema = Schema;
         SqlServer = new SqlServerTranscriber();

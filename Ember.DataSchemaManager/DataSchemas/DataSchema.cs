@@ -4,14 +4,17 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using static Ember.DataScheme.Schemas.TableSchema;
+using static Ember.DataSchemaManager.DataSchemas.TableSchema;
 
-namespace Ember.DataScheme.Schemas;
+namespace Ember.DataSchemaManager.DataSchemas;
 
-public class Schema
+public class DataSchema
 {
+    public ObservableCollection<Schema> SchemaList { get; set; }
+    
+
     public TableSchema TableSchema { get; set; }
-    public Schema(ObservableCollection<String> TableList)
+    public DataSchema(ObservableCollection<String> TableList)
     {
         TableSchema = new TableSchema(TableList);
     }

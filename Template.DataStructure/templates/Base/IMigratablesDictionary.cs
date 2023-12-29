@@ -1,4 +1,4 @@
-﻿using Ember.DataScheme.Schemas;
+﻿using Ember.DataSchemaManager.DataSchemas;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,7 +9,7 @@ namespace Ember.DataStructure.Base;
 
 internal interface IMigratablesDictionary
 {
-    public Schema Schema { get; set; }
+    public DataSchema Schema { get; set; }
     void Up();
     void Down();
 }
