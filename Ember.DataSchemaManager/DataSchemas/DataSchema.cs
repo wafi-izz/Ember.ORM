@@ -10,13 +10,14 @@ namespace Ember.DataSchemaManager.DataSchemas;
 
 public class DataSchema
 {
-    public ObservableCollection<Schema> SchemaList { get; set; }
-    
-
     public TableSchema TableSchema { get; set; }
     public DataSchema(ObservableCollection<String> TableList)
     {
         TableSchema = new TableSchema(TableList);
+    }
+    public DataSchema()
+    {
+        TableSchema = new TableSchema();
     }
     public void Create(String TableName, TableBluePrintCallBack TableBluePrint)
     {

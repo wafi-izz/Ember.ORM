@@ -11,7 +11,7 @@ try
 {
     Console.WriteLine("Program Started.");
 
-    String GeneratedQuery = Init.Main();
+    String GeneratedQuery = Init.Second();
     Console.WriteLine("\n*************************************************************\n");
     Console.WriteLine(GeneratedQuery);
     Console.WriteLine("\n*************************************************************\n");

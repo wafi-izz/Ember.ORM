@@ -6,49 +6,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Ember.DataStructure.Database;
 
 namespace Ember.DataStructure.Migrations.M_02_Tables;
 
-public class T_01_ObjectTypes : Table, IMigratablesDictionary
+public class T_01_ObjectTypes : Table , IMigratablesDictionary
 {
     public String TableName { get; set; }
     public DataSchema Schema { get; set; }
+    public D_01_Database MSSQLDB { get; set; }
+    //public D_02_PostgreDB PostgreDB { get; set; }
     public T_01_ObjectTypes()
     {
         TableName = ExtractObjectName(this.GetType().Name);
+        MSSQLDB = new D_01_Database();
+        //PostgreDB = new D_02_PostgreDB();
     }
     public void Up()
     {
 
-        // code create schema
-        // code create table with some schema
-        // code create function with some schema
-
-        DataSchema sqldb = new DataSchema();
-        DataSchema postdb = new DataSchema();
-        DataSchema litefb = new DataSchema();
-
-        sqldb.CreateSchema("sys-parla","admin");
-        postdb.CreateSchema("sys-parla","admin");
-        litefb.CreateSchema("sys-parla","admin");
-
-        postdb.Create(TableName, Table =>
+        MSSQLDB.Create(TableName, Table =>
         {
             Table.Integer("ObjectTypeID").PrimaryKey().Identity();
             Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
             Table.String("ObjectTypeName", 500).Default("some name default");
-        }, "sys-parla");
-        
-        litefb.Create(TableName, Table =>
-        {
-            Table.Integer("ObjectTypeID").PrimaryKey().Identity();
-            Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
-            Table.String("ObjectTypeName", 500).Default("some name default");
-        }, "sys-parla");
-
-
-
-
+            Table.String("ObjectTypeName_AR", 500).Nullable();
+            Table.Varchar("ShortName", "max");
+            Table.String("ShortName_AR", 500);
+            Table.Boolean("PermissionAble").Default(false).Nullable();
+            Table.Boolean("Keyable").Default(false).Nullable();
+            Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
+        });
 
         Schema.Create(TableName, Table =>
         {

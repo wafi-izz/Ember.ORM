@@ -17,6 +17,10 @@ public class TableSchema
         TableBluePrintList = new ObservableCollection<TableBluePrint>();
         this.TableList = TableList;
     }
+    public TableSchema()
+    {
+        TableBluePrintList = new ObservableCollection<TableBluePrint>();
+    }
     public Boolean HasTable(string TableName)
     {
         return (TableList.Contains(TableName));
