@@ -6,9 +6,9 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ember.DataStructure.Base;
+namespace Ember.DataSchemaManager.Dictionaries;
 
-internal interface IMigratablesDictionary
+public interface IMigratablesDictionary
 {
     public DataSchema Schema { get; set; }
     void Up();

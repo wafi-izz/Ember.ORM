@@ -1,11 +1,7 @@
-﻿using Ember.DataStructure.Base;
-using Ember.DataStructure.Base.DatabaseObjects;
-using Ember.Transcription;
-using Ember.DataSchemaManager.DataSchemas;
+﻿using Ember.DataSchemaManager.DataSchemas;
+using Ember.DataSchemaManager.Dictionaries;
 using Ember.DataStructure.Database;
-using Ember.DataStructure.Migrations.M_02_Tables;
 using System.Reflection;
-using System.Net.Quic;
 using System.Collections.ObjectModel;
 
 namespace Ember.DataStructure;
@@ -18,7 +14,7 @@ public class Init
     }
     public static String Main()
     {
-        DatabaseObjectScrapper Scrapper = new DatabaseObjectScrapper();
+        DataSchemaObjectScraper Scrapper = new DataSchemaObjectScraper();
         DataSchema Schema = new DataSchema();
 
         var MigrationTypes = AppDomain.CurrentDomain.GetAssemblies()
@@ -43,7 +39,7 @@ public class Init
 
     public static String Second()
     {
-        DatabaseObjectScrapper Scrapper = new DatabaseObjectScrapper();
+        DataSchemaObjectScraper Scrapper = new DataSchemaObjectScraper();
         DataSchema Schema = new DataSchema();
         ObservableCollection<Object> DataSchemaList = new ObservableCollection<Object>();
 

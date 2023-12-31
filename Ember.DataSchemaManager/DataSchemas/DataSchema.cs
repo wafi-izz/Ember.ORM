@@ -8,6 +8,14 @@ using static Ember.DataSchemaManager.DataSchemas.TableSchema;
 
 namespace Ember.DataSchemaManager.DataSchemas;
 
+public enum SqlTypeEnum
+{
+    SQL,
+    SqlServer,
+    PostgreSql,
+    MySql,
+    Sqlite,
+}
 public class DataSchema
 {
     public TableSchema TableSchema { get; set; }

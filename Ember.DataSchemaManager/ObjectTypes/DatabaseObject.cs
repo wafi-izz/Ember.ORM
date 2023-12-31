@@ -1,6 +1,5 @@
-﻿using System.Collections.ObjectModel;
-
-namespace Ember.DataStructure.Base.DatabaseObjects;
+﻿
+namespace Ember.DataSchemaManager.ObjectTypes;
 
 public class DatabaseObject
 {

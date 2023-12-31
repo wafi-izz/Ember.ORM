@@ -1,16 +1,11 @@
-﻿using DataStructure.Base.DatabaseObjects;
-using Ember.DataStructure.Base;
-using Ember.DataSchemaManager.DataSchemas;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Ember.DataSchemaManager.DataSchemas;
+using Ember.DataSchemaManager.Dictionaries;
+using Ember.DataSchemaManager.ObjectTypes;
 using Ember.DataStructure.Database;
 
 namespace Ember.DataStructure.Migrations.M_02_Tables;
 
-public class T_01_ObjectTypes : Table , IMigratablesDictionary
+public class T_01_ObjectTypes : Table, IMigratablesDictionary
 {
     public String TableName { get; set; }
     public DataSchema Schema { get; set; }

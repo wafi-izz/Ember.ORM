@@ -22,6 +22,7 @@ try
     DA.CreateCommand(GeneratedQuery).ExecuteQuery();
     DA.Transaction.Commit();
 
+    Console.WriteLine("Program Ended.");
     //new Main();
 }
 catch (Exception e)

@@ -36,8 +36,4 @@
 	  <None Remove="templates\README.md" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
-	</ItemGroup>
-
 </Project>

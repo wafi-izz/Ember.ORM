@@ -26,11 +26,3 @@ public class Transcriber
         return "";
     }
 }
-public enum SqlTypeEnum
-{
-    SQL,
-    SqlServer,
-    PostgreSql,
-    MySql,
-    SqlLite,
-}

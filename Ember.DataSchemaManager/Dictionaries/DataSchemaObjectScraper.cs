@@ -6,9 +6,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Ember.DataStructure.Base.DatabaseObjects;
+namespace Ember.DataSchemaManager.Dictionaries;
 
-public class DatabaseObjectScrapper
+public class DataSchemaObjectScraper
 {
     public ObservableCollection<String> TableList
     {
@@ -24,7 +24,7 @@ public class DatabaseObjectScrapper
             return new ObservableCollection<String>(from i in MigrationTypes select i.Name);
         }
     }
-    public DatabaseObjectScrapper()
+    public DataSchemaObjectScraper()
     {
         
     }
