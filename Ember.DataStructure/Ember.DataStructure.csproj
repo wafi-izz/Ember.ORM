@@ -13,10 +13,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="System.Data.SqlClient" Version="4.8.5" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<Folder Include="Migrations\M_01_DataTypes\" />
 		<Folder Include="DatabaseObjects\" />
 	</ItemGroup>
@@ -29,7 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <ProjectReference Include="..\Ember.DataSchemaManager\Ember.DataSchemaManager.csproj" />
+	  <ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
 	</ItemGroup>
 
 </Project>

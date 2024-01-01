@@ -1,17 +1,12 @@
-﻿using Ember.DataAccessManager;
-using Ember.DataStructure;
-using System;
-using System.Collections.Generic;
+﻿using Ember.DataStructure;
 using System.Configuration;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 try
 {
     Console.WriteLine("Program Started.");
 
-    String GeneratedQuery = Init.Second();
+    List<String> GeneratedQuery = new Init().GeneratedSchema;
+
     Console.WriteLine("\n*************************************************************\n");
     Console.WriteLine(GeneratedQuery);
     Console.WriteLine("\n*************************************************************\n");

@@ -3,70 +3,42 @@ using Ember.DataSchemaManager.Dictionaries;
 using Ember.DataStructure.Database;
 using System.Reflection;
 using System.Collections.ObjectModel;
+using Ember.Transcription;
 
 namespace Ember.DataStructure;
 
 public class Init
 {
+    public List<String> GeneratedSchema { get; set; }
     public Init()
     {
-        var t = 3;
-    }
-    public static String Main()
-    {
-        DataSchemaObjectScraper Scrapper = new DataSchemaObjectScraper();
-        DataSchema Schema = new DataSchema();
-
-        var MigrationTypes = AppDomain.CurrentDomain.GetAssemblies()
-            .SelectMany(x => x.GetTypes())
-            .Where(x => typeof(IMigratablesDictionary).IsAssignableFrom(x))
-            .Where(x => x.Namespace!.StartsWith($"{nameof(Ember)}.{nameof(DataStructure)}.{nameof(Migrations)}"))
-            .Where(x => x.IsInterface == false)
-            .OrderBy(x => x.Namespace)
-            .ToList();
-        foreach (Type type in MigrationTypes)
-        {
-            IMigratablesDictionary Migration = (IMigratablesDictionary)Activator.CreateInstance(type)!;
-            var t = type.GetType().Name;
-            Migration.Schema = Schema;
-            Migration.Down();
-            Migration.Up();
-        }
-        Transcriber Transcriber = new Transcriber(Schema, SqlTypeEnum.SqlServer);
-        String GeneratedScript = Transcriber.Transcribe();
-        return GeneratedScript; //"a generated database script ... hopefully"
-    }
-
-    public static String Second()
-    {
-        DataSchemaObjectScraper Scrapper = new DataSchemaObjectScraper();
         DataSchema Schema = new DataSchema();
         ObservableCollection<Object> DataSchemaList = new ObservableCollection<Object>();
 
-        var MigrationTypes = AppDomain.CurrentDomain.GetAssemblies()
+        List<Type> MigrationList = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .Where(x => typeof(IMigratablesDictionary).IsAssignableFrom(x))
             .Where(x => x.Namespace!.StartsWith($"{nameof(Ember)}.{nameof(DataStructure)}.{nameof(Migrations)}"))
             .Where(x => x.IsInterface == false)
             .OrderBy(x => x.Namespace)
             .ToList();
-        foreach (Type type in MigrationTypes)
+        foreach (Type Migration in MigrationList)
         {
-            IMigratablesDictionary DBObject = (IMigratablesDictionary)Activator.CreateInstance(type)!;
+            IMigratablesDictionary DBObject = (IMigratablesDictionary)Activator.CreateInstance(Migration)!;
             DBObject.Schema = Schema;
             DBObject.Down();
             DBObject.Up();
-            foreach (PropertyInfo Property in type.GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
+            foreach (PropertyInfo Property in Migration.GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
             {
                 DataSchemaList.Add(Property.GetValue(DBObject)!);
             }
         }
-        List<String> TranscribedSchema = new List<string>();
+        List<String> TranscribedSchema = new List<String>();
         foreach (var DataSchema in DataSchemaList)
         {
             TranscribedSchema.Add(new Transcriber((DataSchema)DataSchema, SqlTypeEnum.SqlServer).Transcribe());
         }
         var tt = GlobalDataSchema.MyPostgreDBObject;
-        return TranscribedSchema.ToString()!; //"a generated database script ... hopefully"
+        GeneratedSchema = TranscribedSchema; //"a generated database script ... Hopefully"
     }
 }

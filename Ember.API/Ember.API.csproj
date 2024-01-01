@@ -14,7 +14,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Ember.DataAccess\Ember.DataAccess.csproj" />
+    <ProjectReference Include="..\Ember.DataAccess\Ember.DataAccessManager.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,11 +1,7 @@
 ﻿using Ember.DataSchemaManager.DataSchemas;
-using System;
-using System.Collections.Generic;
+using Ember.DataSchemaManager.Dictionaries;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Ember.DataSchemaManager;
 
@@ -16,20 +12,20 @@ internal class Program
         DataSchema Schema = new DataSchema();
         ObservableCollection<Object> DataSchemaList = new ObservableCollection<Object>();
 
-        List<Assembly> MigrationTypes = AppDomain.CurrentDomain.GetAssemblies()
+        List<Assembly> MigrationList = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .Where(x => typeof(IMigratablesDictionary).IsAssignableFrom(x))
             .Where(x => x.Namespace!.StartsWith($"{nameof(Ember)}.{nameof(DataStructure)}.{nameof(Migrations)}"))
             .Where(x => x.IsInterface == false)
             .OrderBy(x => x.Namespace)
             .ToList();
-        foreach (Type type in MigrationTypes)
+        foreach (Assembly Migrate in MigrationList)
         {
-            IMigratablesDictionary DBObject = (IMigratablesDictionary)Activator.CreateInstance(type)!;
+            IMigratablesDictionary DBObject = (IMigratablesDictionary)Activator.CreateInstance(Migrate.GetType())!;
             DBObject.Schema = Schema;
             DBObject.Down();
             DBObject.Up();
-            foreach (PropertyInfo Property in type.GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
+            foreach (PropertyInfo Property in Migrate.GetType().GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
             {
                 DataSchemaList.Add(Property.GetValue(DBObject)!);
             }
