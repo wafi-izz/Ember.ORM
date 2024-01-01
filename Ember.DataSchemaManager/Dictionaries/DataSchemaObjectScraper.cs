@@ -1,4 +1,4 @@
-﻿using DataStructure.Base.DatabaseObjects;
+﻿using Ember.DataSchemaManager.ObjectTypes;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -17,7 +17,7 @@ public class DataSchemaObjectScraper
             var MigrationTypes = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .Where(x => typeof(Table).IsAssignableFrom(x))
-            .Where(x => x.Namespace!.StartsWith($"{nameof(DataStructure)}.{nameof(Migrations)}.{nameof(Migrations.M_02_Tables)}"))
+            //.Where(x => x.Namespace!.StartsWith($"{nameof(DataStructure)}.{nameof(Migrations)}.{nameof(Migrations.M_02_Tables)}"))
             .Where(x => x.IsInterface == false)
             .OrderBy(x => x.Namespace)
             .ToList();

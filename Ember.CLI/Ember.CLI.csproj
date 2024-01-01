@@ -20,6 +20,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Ember.DataAccessManager\Ember.DataAccessManager.csproj" />
     <ProjectReference Include="..\Ember.DataStructure\Ember.DataStructure.csproj" />
   </ItemGroup>
 

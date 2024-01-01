@@ -8,7 +8,7 @@ using static Ember.DataSchemaManager.DataSchemas.TableSchema;
 
 namespace Ember.DataSchemaManager.DataSchemas;
 
-public enum SqlTypeEnum
+public enum DatabaseProviderEnum
 {
     SQL,
     SqlServer,
@@ -19,6 +19,11 @@ public enum SqlTypeEnum
 public class DataSchema
 {
     public TableSchema TableSchema { get; set; }
+    //Database Informations
+    public String DatabaseName { get; set; }
+    public String DatabaseVersion { get; set; } = "1.0"; // TODO : a global variable to control versions. maybe it should be across all DBs
+    public DatabaseProviderEnum DatabaseProvider { get; set; }
+    // ...
     public DataSchema(ObservableCollection<String> TableList)
     {
         TableSchema = new TableSchema(TableList);

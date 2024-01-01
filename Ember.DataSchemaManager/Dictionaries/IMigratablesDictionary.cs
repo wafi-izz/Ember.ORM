@@ -10,7 +10,6 @@ namespace Ember.DataSchemaManager.Dictionaries;
 
 public interface IMigratablesDictionary
 {
-    public DataSchema Schema { get; set; }
     void Up();
     void Down();
 }

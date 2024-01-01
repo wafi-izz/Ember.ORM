@@ -11,18 +11,16 @@ namespace Ember.Transcription;
 public class Transcriber
 {
     public DataSchema Schema { get; set; }
-    public SqlTypeEnum ActiveSQL { get; set; }
-    public SqlServerTranscriber SqlServer { get; set; }
-    public Transcriber(DataSchema Schema, SqlTypeEnum ActiveSQL)
+    public DatabaseProviderEnum DatabaseProvider { get; set; }
+    public Transcriber(DataSchema Schema)
     {
         this.Schema = Schema;
-        SqlServer = new SqlServerTranscriber();
-        this.ActiveSQL = ActiveSQL;
+        this.DatabaseProvider = Schema.DatabaseProvider;
     }
     public String Transcribe()
     {
         // TODO : when transcribing any SQL DB type make a rule function to mkae it more adhesive to that SQL Provider type. 
-        if (ActiveSQL == SqlTypeEnum.SqlServer) return SqlServer.Transcribe(Schema);
+        if (DatabaseProvider == DatabaseProviderEnum.SqlServer) return new SqlServerTranscriber().Transcribe(Schema);
         return "";
     }
 }

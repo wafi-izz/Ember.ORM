@@ -12,9 +12,6 @@ public class Init
     public List<String> GeneratedSchema { get; set; }
     public Init()
     {
-        DataSchema Schema = new DataSchema();
-        ObservableCollection<Object> DataSchemaList = new ObservableCollection<Object>();
-
         List<Type> MigrationList = AppDomain.CurrentDomain.GetAssemblies()
             .SelectMany(x => x.GetTypes())
             .Where(x => typeof(IMigratablesDictionary).IsAssignableFrom(x))
@@ -22,23 +19,14 @@ public class Init
             .Where(x => x.IsInterface == false)
             .OrderBy(x => x.Namespace)
             .ToList();
-        foreach (Type Migration in MigrationList)
+        MigrationList.ForEach(Migration =>
         {
-            IMigratablesDictionary DBObject = (IMigratablesDictionary)Activator.CreateInstance(Migration)!;
-            DBObject.Schema = Schema;
+            var DBObject = (IMigratablesDictionary)Activator.CreateInstance(Migration)!;
             DBObject.Down();
             DBObject.Up();
-            foreach (PropertyInfo Property in Migration.GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
-            {
-                DataSchemaList.Add(Property.GetValue(DBObject)!);
-            }
-        }
-        List<String> TranscribedSchema = new List<String>();
-        foreach (var DataSchema in DataSchemaList)
-        {
-            TranscribedSchema.Add(new Transcriber((DataSchema)DataSchema, SqlTypeEnum.SqlServer).Transcribe());
-        }
-        var tt = GlobalDataSchema.MyPostgreDBObject;
-        GeneratedSchema = TranscribedSchema; //"a generated database script ... Hopefully"
+        });
+        //foreach (PropertyInfo Property in typeof(GlobalDataSchema).GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
+        ObservableCollection<DataSchema> DataSchemaList = [.. typeof(GlobalDataSchema).GetFields(BindingFlags.Public | BindingFlags.Static).Where(x => typeof(DataSchema).IsAssignableFrom(x.FieldType)).Select(x => (DataSchema)x.GetValue(null)!)];
+        GeneratedSchema = [.. DataSchemaList.Select(x => new Transcriber(x).Transcribe())]; //"a generated database script ... Hopefully"
     }
 }

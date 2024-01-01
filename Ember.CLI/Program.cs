@@ -1,4 +1,5 @@
-﻿using Ember.DataStructure;
+﻿using Ember.DataAccessManager;
+using Ember.DataStructure;
 using System.Configuration;
 
 try
@@ -14,7 +15,7 @@ try
     string ConnectionString = ConfigurationManager.ConnectionStrings["db"].ConnectionString;
     DataAccess DA = new DataAccess(ConnectionString);
     DA.Transaction.Begin();
-    DA.CreateCommand(GeneratedQuery).ExecuteQuery();
+    DA.CreateCommand(GeneratedQuery[0]).ExecuteQuery();
     DA.Transaction.Commit();
 
     Console.WriteLine("Program Ended.");
