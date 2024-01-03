@@ -28,5 +28,6 @@ public class Init
         //foreach (PropertyInfo Property in typeof(GlobalDataSchema).GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
         ObservableCollection<DataSchema> DataSchemaList = [.. typeof(GlobalDataSchema).GetFields(BindingFlags.Public | BindingFlags.Static).Where(x => typeof(DataSchema).IsAssignableFrom(x.FieldType)).Select(x => (DataSchema)x.GetValue(null)!)];
         GeneratedSchema = [.. DataSchemaList.Select(x => new Transcriber(x).Transcribe())]; //"a generated database script ... Hopefully"
+        var y = 1;
     }
 }

@@ -14,7 +14,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
     }
     public void Up()
     {
-        GlobalDataSchema.MyPostgreDB.Create(TableName, Table =>
+        GlobalDataSchema.PostgreDB.Create(TableName, Table =>
         {
             Table.Integer("ObjectTypeID").PrimaryKey().Identity();
             Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
@@ -26,7 +26,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
         });
-        GlobalDataSchema.MyMSSQLDB.Create(TableName, Table =>
+        GlobalDataSchema.MSSQLDB.Create(TableName, Table =>
         {
             Table.Integer("ObjectTypeID").PrimaryKey().Identity();
             Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
@@ -38,7 +38,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
         });
-        GlobalDataSchema.MyMSSQLDB.Create(TableName + "2", Table =>
+        GlobalDataSchema.MSSQLDB.Create(TableName + "2", Table =>
         {
             Table.Integer("ObjectTypeID").PrimaryKey().Identity();
             Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").OnDelete("cascade").OnUpdate("cascade");
@@ -55,8 +55,8 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
     }
     public void Down()
     {
-        GlobalDataSchema.MyMSSQLDB.DropTable(TableName + "2");
-        GlobalDataSchema.MyMSSQLDB.DropTable(TableName);
-        GlobalDataSchema.MyPostgreDB.DropTable(TableName);
+        GlobalDataSchema.MSSQLDB.DropTable(TableName + "2");
+        GlobalDataSchema.MSSQLDB.DropTable(TableName);
+        GlobalDataSchema.PostgreDB.DropTable(TableName);
     }
 }

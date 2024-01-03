@@ -24,13 +24,11 @@ public class DataSchema
     public String DatabaseVersion { get; set; } = "1.0"; // TODO : a global variable to control versions. maybe it should be across all DBs
     public DatabaseProviderEnum DatabaseProvider { get; set; }
     // ...
-    public DataSchema(ObservableCollection<String> TableList)
+    public DataSchema(String DatabaseName,DatabaseProviderEnum DatabaseProvider)
     {
-        TableSchema = new TableSchema(TableList);
-    }
-    public DataSchema()
-    {
-        TableSchema = new TableSchema();
+        this.DatabaseName = DatabaseName;
+        this.DatabaseProvider = DatabaseProvider;
+        this.TableSchema = new TableSchema();
     }
     public void Create(String TableName, TableBluePrintCallBack TableBluePrint)
     {
@@ -39,5 +37,9 @@ public class DataSchema
     public void DropTable(String TableName)
     {
         TableSchema.Drop(TableName);
+    }
+    public Boolean HasTable(String TableName)
+    {
+        return TableSchema.HasTable(TableName);
     }
 }

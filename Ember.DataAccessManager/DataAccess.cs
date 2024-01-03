@@ -5,6 +5,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Configuration;
 
 namespace Ember.DataAccessManager;
 
@@ -88,5 +89,18 @@ public class DataTransaction
             Transaction.Rollback();
             TransactionState = false;
         }
+    }
+}
+
+
+public class EmberConnections
+{
+    public static String ConnectionString(String ConnectionName)
+    {
+        return CS(ConnectionName);
+    }
+    public static String CS(String ConnectionName)
+    {
+        return ConfigurationManager.ConnectionStrings[ConnectionName].ConnectionString;
     }
 }
