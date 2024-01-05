@@ -9,18 +9,19 @@ try
 {
     Console.WriteLine("Program Started.");
 
-    String Main1 = EmberConnections.CS("Main1");
-    String Helper2 = EmberConnections.CS("Helper2");
-    String Side3 = EmberConnections.CS("Side3");
-    String Backup4 = EmberConnections.CS("Backup4");
+    ConnectionStringManager Main1 = new ConnectionStringManager("Main1");
+    ConnectionStringManager Helper2 = new ConnectionStringManager("Helper2");
+    ConnectionStringManager Side3 = new ConnectionStringManager("Side3");
+    ConnectionStringManager Backup4 = new ConnectionStringManager("Backup4");
 
-    SqlConnection Main1Conn = new SqlConnection(Main1);
-    NpgsqlConnection Helper2Conn = new NpgsqlConnection(Helper2);
-    MySqlConnection Side3Conn = new MySqlConnection(Side3);
-    SQLiteConnection Backup4Conn = new SQLiteConnection(Backup4);
+
+    SqlConnection Main1Conn = new SqlConnection(Main1.CS);
+    NpgsqlConnection Helper2Conn = new NpgsqlConnection(Helper2.CS);
+    MySqlConnection Side3Conn = new MySqlConnection(Side3.CS);
+    SQLiteConnection Backup4Conn = new SQLiteConnection(Backup4.CS);
 
     Main1Conn.Open();
-    SqlDataReader Main1Com = new SqlCommand("select 1 as fff",Main1Conn).ExecuteReader();
+    SqlDataReader Main1Com = new SqlCommand("select 1 as fff", Main1Conn).ExecuteReader();
     Main1Conn.Close();
 
 
@@ -38,8 +39,6 @@ try
     SQLiteDataReader Backup4Com = new SQLiteCommand("select 1 as fff", Backup4Conn).ExecuteReader();
     Backup4Conn.Close();
 
-    var y = EmberConnections.CS("Main1");
-
     Int32 t = 1;
 
     List<String> GeneratedQuery = new Init().GeneratedSchema;
@@ -48,7 +47,7 @@ try
     Console.WriteLine(GeneratedQuery);
     Console.WriteLine("\n*************************************************************\n");
 
-    string ConnectionString = EmberConnections.CS("Main1");
+    ConnectionStringManager ConnectionString = new ConnectionStringManager("Main1");
     DataAccess DA = new DataAccess(ConnectionString);
     DA.Transaction.Begin();
     DA.CreateCommand(GeneratedQuery[0]).ExecuteQuery();
