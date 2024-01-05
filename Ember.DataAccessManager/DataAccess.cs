@@ -12,6 +12,7 @@ using System.Data.SQLite;
 using MySql.Data.MySqlClient;
 using Org.BouncyCastle.Asn1.X509.Qualified;
 using System.Security.Cryptography.X509Certificates;
+using System.Transactions;
 
 namespace Ember.DataAccessManager;
 
@@ -25,26 +26,23 @@ public enum DatabaseProviderEnum
 }
 public class DataAccess
 {
-    public SqlConnection Connection { get; set; }
-    public DataConnection DataConnection { get; set; }
-    public SqlCommand? Command { get; set; }
+    public DataConnection Connection { get; set; }
+    public DataCommand Command { get; set; }
     public String? CommandString { get; set; }
-    public SqlDataReader? ReaderData { get; set; }
+    public dynamic? ReaderData { get; set; }
     public DataTable DataTable { get; set; }
     //Transaction
     public DataAccessTransaction Transaction { get; set; }
     public DataAccess(ConnectionStringManager ConncetionString)
     {
-        Connection = new SqlConnection(ConncetionString.CS);
-        DataConnection = new DataConnection(ConncetionString);
+        Connection = new DataConnection(ConncetionString);
         Connection.Open();
-        DataConnection.Open();
         DataTable = new DataTable();
-        Transaction = new DataAccessTransaction(DataConnection);
+        Transaction = new DataAccessTransaction(Connection);
     }
     public DataAccess CreateCommand(String Query)
     {
-        Command = new SqlCommand(Query, Connection);
+        Command = new DataCommand(Query, Connection);
         if (Transaction.TransactionState) Command.Transaction = Transaction.Transaction;
         return this;
     }
@@ -80,28 +78,23 @@ public class DataAccessTransaction
     public DataAccessTransaction(DataConnection Connection)
     {
         this.Connection = Connection;
-        TransactionState = Transaction!.TransactionState;
+        Transaction = new DataTransaction(Connection);
+        TransactionState = false;
     }
     public void Begin()
     {
-        Transaction = Transaction.Begin();
+        Transaction.Begin();
         TransactionState = true;
     }
     public void Commit()
     {
-        if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
         Transaction?.Commit();
-        Connection.Close();
-        TransactionState = Transaction!.TransactionState;
+        TransactionState = false;
     }
     public void RollBack()
     {
-        if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
-        if (Transaction?.DataConnection != null)
-        {
-            Transaction.Rollback();
-            TransactionState = Transaction!.TransactionState;
-        }
+        Transaction.Rollback();
+        TransactionState = false;
     }
 }
 
@@ -191,19 +184,13 @@ public class DataTransaction
     public Boolean TransactionState { get; set; }
     public DataConnection DataConnection { get; set; }
     public Type? Transaction { get; set; }
-    public System.Data.SqlClient.SqlTransaction? MSSQLTransaction { get; set; }
+    public SqlTransaction? MSSQLTransaction { get; set; }
     public NpgsqlTransaction? PostgreSQLTransaction { get; set; }
     public MySqlTransaction? MySQLTransaction { get; set; }
     public SQLiteTransaction? SQLiteTransaction { get; set; }
     public DataTransaction(DataConnection DataConnection)
     {
         this.DataConnection = DataConnection;
-
-        //if (DataConnection.Connection == typeof(SqlConnection)) MSSQLTransaction = DataConnection.BeginTransaction();
-        //if (DataConnection.Connection == typeof(NpgsqlConnection)) PostgreSQLTransaction = DataConnection.BeginTransaction();
-        //if (DataConnection.Connection == typeof(MySqlConnection)) MySQLTransaction = DataConnection.BeginTransaction();
-        //if (DataConnection.Connection == typeof(SQLiteConnection)) SQLiteTransaction = DataConnection.BeginTransaction();
-
         if (DataConnection.Connection == typeof(SqlConnection)) Transaction = typeof(System.Data.SqlClient.SqlTransaction);
         if (DataConnection.Connection == typeof(NpgsqlConnection)) Transaction = typeof(NpgsqlTransaction);
         if (DataConnection.Connection == typeof(MySqlConnection)) Transaction = typeof(MySqlTransaction);
@@ -211,27 +198,59 @@ public class DataTransaction
     }
     public void Begin()
     {
-        if(Transaction == typeof(SqlConnection))
+        if (Transaction == typeof(SqlTransaction))
         {
-            TransactionState = true;
             MSSQLTransaction = DataConnection.BeginTransaction();
-        }
+            TransactionState = true;
+        };
     }
     public void Commit()
     {
-        if(Transaction == typeof(SqlConnection))
+        if (Transaction == typeof(SqlConnection))
         {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
             MSSQLTransaction!.Commit();
+            DataConnection.Close();
             TransactionState = false;
         }
     }
     public void Rollback()
     {
-        if(Transaction == typeof(SqlConnection))
+        if (Transaction == typeof(SqlConnection))
         {
-            MSSQLTransaction!.Rollback();
-            TransactionState = false;
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            if (DataConnection != null)
+            {
+                MSSQLTransaction!.Rollback();
+                TransactionState = false;
+            }
         }
+    }
+}
+public class DataCommand
+{
+    public DataConnection DataConnection { get; set; }
+    public DataTransaction Transaction { get; set; }
+    public SqlCommand? MSSQLCommand { get; set; }
+    public NpgsqlCommand? PostgreSQLCommand { get; set; }
+    public MySqlCommand? MySQLCommand { get; set; }
+    public SQLiteCommand? SQLiteCommand { get; set; }
+    public DataCommand(String Query,DataConnection DataConnection)
+    {
+        this.DataConnection = DataConnection;
+        if (DataConnection.Connection == typeof(SqlConnection)) MSSQLCommand = new SqlCommand(Query,DataConnection.MSSQLConnection);
+        if (DataConnection.Connection == typeof(NpgsqlConnection)) PostgreSQLCommand = new NpgsqlCommand(Query, DataConnection.PostgreSQLConnection);
+        if (DataConnection.Connection == typeof(MySqlConnection)) MySQLCommand = new MySqlCommand(Query, DataConnection.MySQLConnection);
+        if (DataConnection.Connection == typeof(SQLiteConnection)) SQLiteCommand = new SQLiteCommand(Query, DataConnection.SQLiteConnection);
+    }
+    public dynamic ExecuteReader()
+    {
+        if (DataConnection.Connection == typeof(SqlConnection))
+        {
+            MSSQLCommand!.Transaction = Transaction!.MSSQLTransaction;
+            return MSSQLCommand!.ExecuteReader();
+        }
+        return null!;
     }
 }
 #endregion
