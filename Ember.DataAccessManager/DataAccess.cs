@@ -162,6 +162,18 @@ public class DataConnection
         {
             MSSQLConnection!.Open();
         }
+        if (Connection == typeof(NpgsqlConnection))
+        {
+            PostgreSQLConnection!.Open();
+        }
+        if (Connection == typeof(MySqlConnection))
+        {
+            MySQLConnection!.Open();
+        }
+        if (Connection == typeof(SQLiteConnection))
+        {
+            SQLiteConnection!.Open();
+        }
     }
     public void Close()
     {
@@ -169,12 +181,36 @@ public class DataConnection
         {
             MSSQLConnection!.Close();
         }
+        if (Connection == typeof(NpgsqlConnection))
+        {
+            PostgreSQLConnection!.Close();
+        }
+        if (Connection == typeof(MySqlConnection))
+        {
+            MySQLConnection!.Close();
+        }
+        if (Connection == typeof(SQLiteConnection))
+        {
+            SQLiteConnection!.Close();
+        }
     }
     public dynamic BeginTransaction()
     {
         if (Connection == typeof(SqlConnection))
         {
             return MSSQLConnection!.BeginTransaction();
+        }
+        if (Connection == typeof(NpgsqlConnection))
+        {
+            return PostgreSQLConnection!.BeginTransaction();
+        }
+        if (Connection == typeof(MySqlConnection))
+        {
+            return MySQLConnection!.BeginTransaction();
+        }
+        if (Connection == typeof(SQLiteConnection))
+        {
+            return SQLiteConnection!.BeginTransaction();
         }
         return null!;
     }
@@ -191,7 +227,7 @@ public class DataTransaction
     public DataTransaction(DataConnection DataConnection)
     {
         this.DataConnection = DataConnection;
-        if (DataConnection.Connection == typeof(SqlConnection)) Transaction = typeof(System.Data.SqlClient.SqlTransaction);
+        if (DataConnection.Connection == typeof(SqlConnection)) Transaction = typeof(SqlTransaction);
         if (DataConnection.Connection == typeof(NpgsqlConnection)) Transaction = typeof(NpgsqlTransaction);
         if (DataConnection.Connection == typeof(MySqlConnection)) Transaction = typeof(MySqlTransaction);
         if (DataConnection.Connection == typeof(SQLiteConnection)) Transaction = typeof(SQLiteTransaction);
@@ -202,26 +238,89 @@ public class DataTransaction
         {
             MSSQLTransaction = DataConnection.BeginTransaction();
             TransactionState = true;
-        };
+        }
+        if (Transaction == typeof(NpgsqlTransaction))
+        {
+            PostgreSQLTransaction = DataConnection.BeginTransaction();
+            TransactionState = true;
+        }
+        if (Transaction == typeof(MySqlTransaction))
+        {
+            MySQLTransaction = DataConnection.BeginTransaction();
+            TransactionState = true;
+        }
+        if (Transaction == typeof(SQLiteTransaction))
+        {
+            SQLiteTransaction = DataConnection.BeginTransaction();
+            TransactionState = true;
+        }
     }
     public void Commit()
     {
-        if (Transaction == typeof(SqlConnection))
+        if (Transaction == typeof(SqlTransaction))
         {
             if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
             MSSQLTransaction!.Commit();
             DataConnection.Close();
             TransactionState = false;
         }
+        if (Transaction == typeof(NpgsqlTransaction))
+        {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            PostgreSQLTransaction!.Commit();
+            DataConnection.Close();
+            TransactionState = false;
+        }
+        if (Transaction == typeof(MySqlTransaction))
+        {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            MySQLTransaction!.Commit();
+            DataConnection.Close();
+            TransactionState = false;
+        }
+        if (Transaction == typeof(SQLiteTransaction))
+        {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            SQLiteTransaction!.Commit();
+            DataConnection.Close();
+            TransactionState = false;
+        }
     }
     public void Rollback()
     {
-        if (Transaction == typeof(SqlConnection))
+        if (Transaction == typeof(SqlTransaction))
         {
             if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
             if (DataConnection != null)
             {
                 MSSQLTransaction!.Rollback();
+                TransactionState = false;
+            }
+        }
+        if (Transaction == typeof(NpgsqlTransaction))
+        {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            if (DataConnection != null)
+            {
+                PostgreSQLTransaction!.Rollback();
+                TransactionState = false;
+            }
+        }
+        if (Transaction == typeof(MySqlTransaction))
+        {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            if (DataConnection != null)
+            {
+                MySQLTransaction!.Rollback();
+                TransactionState = false;
+            }
+        }
+        if (Transaction == typeof(SQLiteTransaction))
+        {
+            if (!TransactionState) { throw new Exception("No Transaction Begin Was Found."); }
+            if (DataConnection != null)
+            {
+                SQLiteTransaction!.Rollback();
                 TransactionState = false;
             }
         }
@@ -249,6 +348,21 @@ public class DataCommand
         {
             MSSQLCommand!.Transaction = Transaction!.MSSQLTransaction;
             return MSSQLCommand!.ExecuteReader();
+        }
+        if (DataConnection.Connection == typeof(NpgsqlConnection))
+        {
+            PostgreSQLCommand!.Transaction = Transaction!.PostgreSQLTransaction;
+            return PostgreSQLCommand!.ExecuteReader();
+        }
+        if (DataConnection.Connection == typeof(MySqlConnection))
+        {
+            MySQLCommand!.Transaction = Transaction!.MySQLTransaction;
+            return MySQLCommand!.ExecuteReader();
+        }
+        if (DataConnection.Connection == typeof(SQLiteConnection))
+        {
+            SQLiteCommand!.Transaction = Transaction!.SQLiteTransaction;
+            return SQLiteCommand!.ExecuteReader();
         }
         return null!;
     }
