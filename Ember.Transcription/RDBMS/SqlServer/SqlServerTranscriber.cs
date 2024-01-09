@@ -7,12 +7,11 @@ using System.Threading.Tasks;
 
 namespace Ember.Transcription.RDBMS.SqlServer;
 
-public class SqlServerTranscriber
+internal class SqlServerTranscriber
 {
-    public SqlServerTranscriber() { }
-    public String Transcribe(DataSchema Schema)
+    internal SqlServerTranscriber() { }
+    internal String Transcribe(DataSchema Schema)
     {
-        SqlServerTableTranscriber TableTranscription = new SqlServerTableTranscriber(Schema.TableSchema);
-        return TableTranscription.TransScript;
+        return new SqlServerTableTranscriber(Schema.TableSchema).TransScript;
     }
 }

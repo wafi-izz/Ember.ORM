@@ -1,15 +1,20 @@
 ﻿using Ember.DataSchemaManager.BluePrints;
 using Ember.DataSchemaManager.DataSchemas;
 using Ember.Transcription.TranscriptionInterfaces;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.Json.Nodes;
+using System.Threading.Tasks;
 
-namespace Ember.Transcription.RDBMS.SqlServer;
+namespace Ember.Transcription.RDBMS.PostgreSql;
 
-
-internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
+internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
 {
     public String TransScript { get; set; }
     public TableSchema TableSchema { get; set; }
-    public SqlServerTableTranscriber(TableSchema TableSchema)
+    public PostgreSqlTableTranscriber(TableSchema TableSchema)
     {
         TransScript = "";
         this.TableSchema = TableSchema;
@@ -45,6 +50,28 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
         }
         TransScript += $");\n\n ";
     }
+    public override String ForeignKeySection(String TableName, ColumnBluePrint Column)
+    {
+        if (!Column.IsForeignKey)
+            return "";
+
+        String ForeignTable = Column.ForeignKeyArguments["ForeignTable"]!.GetValue<String>();
+        String ForeignTableColumnName = Column.ForeignKeyArguments["ForeignTableColumnName"]!.GetValue<String>();
+        String ColumnName = Column.ColumnName;
+        //on delete
+        String OnDelete = "";
+        if (Column.ForeignKeyArguments["OnDelete"] != null)
+            OnDelete = $"ON DELETE {Column.ForeignKeyArguments["OnDelete"]}";
+
+        //on update
+        String OnUpdate = "";
+        if (Column.ForeignKeyArguments["OnUpdate"] != null)
+            OnUpdate = $"ON UPDATE {Column.ForeignKeyArguments["OnUpdate"]}";
+
+        JsonNode? CustomConstraintName = Column.ForeignKeyArguments["CustomConstraintName"];
+        String ConstraintName = CustomConstraintName != null ? CustomConstraintName.GetValue<String>() : $"FK_{TableName}_{ForeignTable}_{ColumnName}_{ForeignTableColumnName} ";
+        return $"CONSTRAINT {ConstraintName} REFERENCES {ForeignTable} ({ForeignTableColumnName}) {OnUpdate} {OnDelete} ";
+    }
     #endregion
     #region Alter
     public void Alter(TableBluePrint TableBluePrint)
@@ -55,7 +82,6 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     #region Drop
     public void Drop(TableBluePrint TableBluePrint)
     {
-        TransScript += $"DROP TABLE IF EXISTS {TableBluePrint.ObjectName};\n\n"; // TODO : must specify witch schema to drop to or create in to.
     }
     #endregion
 }
