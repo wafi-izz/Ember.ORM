@@ -54,7 +54,8 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     {
         if (!Column.IsForeignKey)
             return "";
-
+        
+        
         String ForeignTable = Column.ForeignKeyArguments["ForeignTable"]!.GetValue<String>();
         String ForeignTableColumnName = Column.ForeignKeyArguments["ForeignTableColumnName"]!.GetValue<String>();
         String ColumnName = Column.ColumnName;
