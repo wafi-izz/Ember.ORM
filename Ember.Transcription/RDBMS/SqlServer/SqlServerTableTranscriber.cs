@@ -1,6 +1,8 @@
 ﻿using Ember.DataSchemaManager.BluePrints;
 using Ember.DataSchemaManager.DataSchemas;
 using Ember.Transcription.TranscriptionInterfaces;
+using System.Data.Common;
+using System.Security.Principal;
 
 namespace Ember.Transcription.RDBMS.SqlServer;
 
@@ -36,7 +38,7 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
             {
                 TransScript += ColumnHead(Column);
                 TransScript += PrimaryKey(Column);
-                TransScript += Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) " : "";
+                TransScript += IDENTITY(Column);
                 TransScript += ForeignKeySection(TableBluePrint.TableName, Column);
                 TransScript += DefaultValue(Column);
                 TransScript += NullabilityState(Column);
@@ -44,6 +46,10 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
             TransScript += TableBluePrint.Columns.Count > Index ? $",\n" : "\n";
         }
         TransScript += $");\n\n ";
+    }
+    public String IDENTITY(ColumnBluePrint Column)
+    {
+        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) " : "";
     }
     #endregion
     #region Alter
@@ -55,7 +61,7 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     #region Drop
     public void Drop(TableBluePrint TableBluePrint)
     {
-        TransScript += $"DROP TABLE IF EXISTS {TableBluePrint.ObjectName};\n\n"; // TODO : must specify witch schema to drop to or create in to.
+        TransScript += DropTableQuery(TableBluePrint);
     }
     #endregion
 }

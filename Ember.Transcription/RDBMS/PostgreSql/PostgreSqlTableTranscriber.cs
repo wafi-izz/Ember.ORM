@@ -41,7 +41,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
             {
                 TransScript += ColumnHead(Column);
                 TransScript += PrimaryKey(Column);
-                TransScript += Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) " : "";
+                TransScript += IDENTITY(Column);
                 TransScript += ForeignKeySection(TableBluePrint.TableName, Column);
                 TransScript += DefaultValue(Column);
                 TransScript += NullabilityState(Column);
@@ -50,11 +50,14 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
         }
         TransScript += $");\n\n ";
     }
+    public String IDENTITY(ColumnBluePrint Column)
+    {
+        return Column.IsIdentity ? $"GENERATED ALWAYS AS IDENTITY ( INCREMENT {Column.Identity["IncrementValue"]} START {Column.Identity["StartValue"]} MINVALUE 0 MAXVALUE 500 CACHE 1 ) " : "";
+    }
     public override String ForeignKeySection(String TableName, ColumnBluePrint Column)
     {
         if (!Column.IsForeignKey)
             return "";
-        
         
         String ForeignTable = Column.ForeignKeyArguments["ForeignTable"]!.GetValue<String>();
         String ForeignTableColumnName = Column.ForeignKeyArguments["ForeignTableColumnName"]!.GetValue<String>();
@@ -83,6 +86,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     #region Drop
     public void Drop(TableBluePrint TableBluePrint)
     {
+        TransScript += DropTableQuery(TableBluePrint);
     }
     #endregion
 }
