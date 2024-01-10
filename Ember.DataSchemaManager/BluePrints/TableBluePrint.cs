@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 
 namespace Ember.DataSchemaManager.BluePrints;
 
@@ -172,6 +174,20 @@ public class TableBluePrint : BluePrint
         Column.Nullable = true;
         return this;
     }
+    public TableBluePrint Min(dynamic Value)
+    {
+        if (!IsNumeric(Value.ToString()))
+            throw new ArgumentException("Min Value Must Be a Number!");
+        Column.MinValue = Value;
+        return this;
+    }
+    public TableBluePrint Max(dynamic Value)
+    {
+        if (!IsNumeric(Value.ToString()))
+            throw new ArgumentException("Max Value Must Be a Number!");
+        Column.MaxValue = Value;
+        return this;
+    }
     #endregion
 }
 
@@ -186,6 +202,8 @@ public class ColumnBluePrint
     public JsonObject Identity { get; set; }
     public dynamic Default { get; set; }
     public Boolean Nullable { get; set; }
+    public decimal MinValue { get; set; }
+    public decimal MaxValue { get; set; }
     public String Statemant { get; set; }
     public ColumnBluePrint()
     {

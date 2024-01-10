@@ -49,7 +49,7 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     }
     public String IDENTITY(ColumnBluePrint Column)
     {
-        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) " : "";
+        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) CONSTRAINT CHC_ValueRange CHECK (ValueColumn >= {Column.MaxValue} AND ValueColumn <= {Column.MaxValue})" : "";
     }
     #endregion
     #region Alter

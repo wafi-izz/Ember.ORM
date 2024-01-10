@@ -4,9 +4,11 @@ using Ember.Transcription.TranscriptionInterfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Text;
 using System.Text.Json.Nodes;
 using System.Threading.Tasks;
+using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 
 namespace Ember.Transcription.RDBMS.PostgreSql;
 
@@ -50,15 +52,20 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
         }
         TransScript += $");\n\n ";
     }
+    public override String ColumnHead(ColumnBluePrint Column)
+    {
+        var DataTypeParameter = Column.ColumnDataType["Length"] != null ? IsNumeric(Column.ColumnDataType["Length"]!.ToString()) ? $"({Column.ColumnDataType["Length"]})" : "(255)" : "";
+        return $"{Column.ColumnName} {Column.ColumnDataType["DataTypeSQLName"]}{DataTypeParameter} ";
+    }
     public String IDENTITY(ColumnBluePrint Column)
     {
-        return Column.IsIdentity ? $"GENERATED ALWAYS AS IDENTITY ( INCREMENT {Column.Identity["IncrementValue"]} START {Column.Identity["StartValue"]} MINVALUE 0 MAXVALUE 500 CACHE 1 ) " : "";
+        return Column.IsIdentity ? $"GENERATED ALWAYS AS IDENTITY ( INCREMENT {Column.Identity["IncrementValue"]} START {Column.Identity["StartValue"]} MINVALUE {Column.MinValue} MAXVALUE {Column.MaxValue} CACHE 1 ) " : "";
     }
     public override String ForeignKeySection(String TableName, ColumnBluePrint Column)
     {
         if (!Column.IsForeignKey)
             return "";
-        
+
         String ForeignTable = Column.ForeignKeyArguments["ForeignTable"]!.GetValue<String>();
         String ForeignTableColumnName = Column.ForeignKeyArguments["ForeignTableColumnName"]!.GetValue<String>();
         String ColumnName = Column.ColumnName;
