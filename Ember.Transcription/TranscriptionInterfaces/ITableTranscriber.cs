@@ -14,7 +14,8 @@ public interface ITableTranscriber
     TableSchema TableSchema { get; set; }
     void Transcribe();
     void Create(TableBluePrint TableBluePrint);
-    String IDENTITY(ColumnBluePrint Column);
+    String ColumnHead(ColumnBluePrint Column);
+    String IDENTITY(String TableName,ColumnBluePrint Column);
     void Alter(TableBluePrint TableBluePrint);
     void Drop(TableBluePrint TableBluePrint);
 }

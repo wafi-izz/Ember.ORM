@@ -55,7 +55,7 @@ public class TableBluePrint : BluePrint
         Column.ColumnDataType.Add("DataTypeSQLName", "INT");
         return this;
     }
-    public TableBluePrint String(String ColumnName, dynamic Length, StringType StringType = StringType.Varchar)
+    public TableBluePrint String(String ColumnName, dynamic Length, StringType StringType = StringType.VARCHAR)
     {
         ColumnInit();
         Column.ColumnName = ColumnName;
@@ -65,29 +65,19 @@ public class TableBluePrint : BluePrint
         return this;
     }
     #region String Variations
-    public TableBluePrint Varchar(String ColumnName, dynamic Length, String Nationalize = "")
+    public TableBluePrint Varchar(String ColumnName, dynamic Length, Boolean Nationalize = false)
     {
-        String(ColumnName, Length, Nationalize == "" ? StringType.Varchar : StringType.NVarchar);
+        String(ColumnName, Length, Nationalize ? StringType.VARCHAR : StringType.NVARCHAR);
         return this;
     }
-    public TableBluePrint Char(String ColumnName, dynamic Length, String Nationalize = "")
+    public TableBluePrint Char(String ColumnName, dynamic Length, Boolean Nationalize = false)
     {
-        String(ColumnName, Length, Nationalize == "" ? StringType.Char : StringType.NChar);
+        String(ColumnName, Length, Nationalize ? StringType.CHAR : StringType.NCHAR);
         return this;
     }
-    public TableBluePrint Text(String ColumnName, dynamic Length, String Nationalize = "")
+    public TableBluePrint Text(String ColumnName, dynamic Length, Boolean Nationalize = false)
     {
-        String(ColumnName, Length, Nationalize == "" ? StringType.Text : StringType.NText);
-        return this;
-    }
-    public TableBluePrint Binary(String ColumnName, dynamic Length)
-    {
-        String(ColumnName, Length, StringType.Binary);
-        return this;
-    }
-    public TableBluePrint Varbinary(String ColumnName, dynamic Length)
-    {
-        String(ColumnName, Length, StringType.Varbinary);
+        String(ColumnName, Length, Nationalize ? StringType.TEXT : StringType.NTEXT);
         return this;
     }
     #endregion
@@ -96,7 +86,7 @@ public class TableBluePrint : BluePrint
         ColumnInit();
         Column.ColumnName = ColumnName;
         Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Boolean.ToString());
-        Column.ColumnDataType.Add("DataTypeSQLName", "BIT");
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Boolean.ToString()); // this is an specific sql provider datatype shouldn't be defined here.
         return this;
     }
     #endregion
@@ -215,17 +205,17 @@ public class ColumnBluePrint
 public enum ColumnTypeEnum
 {
     Integer,
+    Numeric,
     String,
     Boolean,
 }
+// aaaah ... should all the upported types be here or over at the transcriber class
 public enum StringType
 {
-    Text,
-    NText,
-    Binary,
-    Varbinary,
-    Char,
-    NChar,
-    Varchar,
-    NVarchar,
+    TEXT,
+    NTEXT,
+    CHAR,
+    NCHAR,
+    VARCHAR,
+    NVARCHAR,
 }

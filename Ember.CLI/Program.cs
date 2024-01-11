@@ -46,30 +46,43 @@ try
     Console.WriteLine("\n*************************************************************\n");
 
 
-
-
-    String GeneratedQuery2 =    "create table a(id int)" +
-                                "select 1 as result";
-    String GeneratedQuery3 = "create table a1(id int)" +
-                                "select 1 as result";
-    ConnectionStringManager ConnectionString = new ConnectionStringManager("Side3");
-    DataAccess DA = new DataAccess(ConnectionString);
-    DA.Transaction.Begin();
-    var tb = DA.CreateCommand(GeneratedQuery3).ExecuteQuery();
-    var ta = DA.CreateCommand(GeneratedQuery2).ExecuteQuery();
-    DA.Transaction.Commit();
+        ConnectionStringManager ConnectionString2 = new ConnectionStringManager("Helper2");
+        DataAccess DA = new DataAccess(ConnectionString2);
+        DA.Transaction.Begin();
+        var tb = DA.CreateCommand(GeneratedQuery[0]).ExecuteQuery();
+        DA.Transaction.Commit();
     
 
-    GeneratedQuery2 =    "create table a(id int);" +
-                                "select 1 as result;";
-    GeneratedQuery3 = "create table a1(id int);" +
-                                "select 1 as result;";
-    ConnectionString = new ConnectionStringManager("Backup4");
-    DA = new DataAccess(ConnectionString);
-    DA.Transaction.Begin();
-    tb = DA.CreateCommand(GeneratedQuery3).ExecuteQuery();
-    ta = DA.CreateCommand(GeneratedQuery2).ExecuteQuery();
-    DA.Transaction.Commit();
+        ConnectionString2 = new ConnectionStringManager("Main1");
+        DA = new DataAccess(ConnectionString2);
+        DA.Transaction.Begin();
+        tb = DA.CreateCommand(GeneratedQuery[1]).ExecuteQuery();
+        DA.Transaction.Commit();
+    
+
+
+    //String GeneratedQuery2 =    "create table a(id int)" +
+    //                            "select 1 as result";
+    //String GeneratedQuery3 = "create table a1(id int)" +
+    //                            "select 1 as result";
+    //ConnectionStringManager ConnectionString = new ConnectionStringManager("Side3");
+    //DataAccess DA = new DataAccess(ConnectionString);
+    //DA.Transaction.Begin();
+    //var tb = DA.CreateCommand(GeneratedQuery3).ExecuteQuery();
+    //var ta = DA.CreateCommand(GeneratedQuery2).ExecuteQuery();
+    //DA.Transaction.Commit();
+    
+
+    //GeneratedQuery2 =    "create table a(id int);" +
+    //                            "select 1 as result;";
+    //GeneratedQuery3 = "create table a1(id int);" +
+    //                            "select 1 as result;";
+    //ConnectionString = new ConnectionStringManager("Backup4");
+    //DA = new DataAccess(ConnectionString);
+    //DA.Transaction.Begin();
+    //tb = DA.CreateCommand(GeneratedQuery3).ExecuteQuery();
+    //ta = DA.CreateCommand(GeneratedQuery2).ExecuteQuery();
+    //DA.Transaction.Commit();
 
     Console.WriteLine("Program Ended.");
 }

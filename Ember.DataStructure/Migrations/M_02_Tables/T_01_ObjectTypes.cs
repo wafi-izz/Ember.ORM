@@ -44,7 +44,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").OnDelete("cascade").OnUpdate("cascade");
             Table.String("ObjectTypeName", 500).Default("Some Name Default");
             Table.String("ObjectTypeName_AR", 500).Nullable();
-            Table.Varchar("ShortName", "max", "N");
+            Table.Varchar("ShortName", "max", true);
             Table.String("ShortName_AR", 500);
             Table.Boolean("PermissionAble").Default(false).Nullable();
             Table.Boolean("Keyable").Default(false).Nullable();

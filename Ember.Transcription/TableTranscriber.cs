@@ -1,6 +1,9 @@
 ﻿using Ember.DataSchemaManager.BluePrints;
+using Ember.Transcription.RDBMS.PostgreSql;
+using Ember.Transcription.RDBMS.SqlServer;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -36,11 +39,6 @@ public class TableTranscriber
         String ConstraintName = CustomConstraintName != null ? CustomConstraintName.GetValue<String>() : $"FK_{TableName}_{ForeignTable}_{ColumnName}_{ForeignTableColumnName} ";
         return $"CONSTRAINT {ConstraintName} FOREIGN KEY ({ColumnName}) REFERENCES {ForeignTable} ({ForeignTableColumnName}) {OnUpdate} {OnDelete} ";
     }
-    public virtual String ColumnHead(ColumnBluePrint Column)
-    {
-        var DataTypeParameter = Column.ColumnDataType["Length"] != null ? $"({Column.ColumnDataType["Length"]})" : "";
-        return $"{Column.ColumnName} {Column.ColumnDataType["DataTypeSQLName"]}{DataTypeParameter} ";
-    }
     public virtual String DefaultValue(ColumnBluePrint Column)
     {
         return Column.Default != null ? $"DEFAULT('{Column.Default}') " : "";
@@ -55,4 +53,32 @@ public class TableTranscriber
         return $"DROP TABLE IF EXISTS {TableBluePrint.ObjectName};\n\n"; // TODO : must specify witch schema to drop to or create in to.
     }
     #endregion
+
+    public String? TranscribeDataType(String ColumnDataType, String SpecifiColumnDataType, String Length)
+    {
+        String ClassName = this.GetType().Name;
+        if (ClassName == nameof(SqlServerTableTranscriber))
+        {
+            if (ColumnDataType == ColumnTypeEnum.Boolean.ToString())
+            {
+                return $"BIT{Length}";
+            }
+            else return $"{SpecifiColumnDataType}{Length}";
+        }
+        if (ClassName == nameof(PostgreSqlTableTranscriber))
+        {
+            if (ColumnDataType == ColumnTypeEnum.String.ToString())
+            {
+                if (new String[] { StringType.VARCHAR.ToString(), StringType.CHAR.ToString(), StringType.TEXT.ToString(), StringType.NTEXT.ToString() }.Contains(SpecifiColumnDataType.ToUpper())) return $"{SpecifiColumnDataType}{Length}";
+                // TODO : find a wat to collation nvarchar for postgre
+                if (new String[] { StringType.NVARCHAR.ToString(), StringType.NCHAR.ToString() }.Contains(SpecifiColumnDataType.ToUpper())) return $"{SpecifiColumnDataType.Substring(1)}{Length} /*A NATIONALIZED DATATYPE IS COMMING*/";
+            }
+            else if (ColumnDataType == ColumnTypeEnum.Boolean.ToString())
+            {
+                return "Boolean";
+            }
+            else return $"{SpecifiColumnDataType}{Length}";
+        }
+        return null;
+    }
 }
