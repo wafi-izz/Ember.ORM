@@ -1,4 +1,5 @@
 ﻿using Ember.DataAccessManager;
+using Ember.DataSchemaManager.DataSchemas;
 using Ember.DataStructure;
 using MySql.Data.MySqlClient;
 using Npgsql;
@@ -40,25 +41,22 @@ try
     //Backup4Conn.Close();
 
 
-    List<String> GeneratedQuery = new Init().GeneratedSchema;
+    List<DataSchema> GeneratedDataSchema = new Init().DataSchemaList;
     Console.WriteLine("\n*************************************************************\n");
-    Console.WriteLine(GeneratedQuery);
+    GeneratedDataSchema.ForEach(Item => Console.WriteLine(Item.DatabaseScript));
     Console.WriteLine("\n*************************************************************\n");
 
-
-        ConnectionStringManager ConnectionString2 = new ConnectionStringManager("Helper2");
+    foreach(DataSchema Item in GeneratedDataSchema.Where(x => x.DatabaseScript != null))
+    {
+        ConnectionStringManager ConnectionString2 = new ConnectionStringManager(Item.DatabaseName);
         DataAccess DA = new DataAccess(ConnectionString2);
         DA.Transaction.Begin();
-        var tb = DA.CreateCommand(GeneratedQuery[0]).ExecuteQuery();
+        var tb = DA.CreateCommand(Item.DatabaseScript).ExecuteQuery();
         DA.Transaction.Commit();
+    }
     
 
-        ConnectionString2 = new ConnectionStringManager("Main1");
-        DA = new DataAccess(ConnectionString2);
-        DA.Transaction.Begin();
-        tb = DA.CreateCommand(GeneratedQuery[1]).ExecuteQuery();
-        DA.Transaction.Commit();
-    
+     
 
 
     //String GeneratedQuery2 =    "create table a(id int)" +

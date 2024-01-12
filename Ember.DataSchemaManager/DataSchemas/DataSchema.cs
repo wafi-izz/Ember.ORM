@@ -21,6 +21,7 @@ public class DataSchema
     public TableSchema TableSchema { get; set; }
     //Database Informations
     public String DatabaseName { get; set; }
+    public String DatabaseScript { get; set; }
     public String DatabaseVersion { get; set; } = "1.0"; // TODO : a global variable to control versions. maybe it should be across all DBs
     public DatabaseProviderEnum DatabaseProvider { get; set; }
     // ...

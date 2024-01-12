@@ -9,7 +9,7 @@ namespace Ember.DataStructure;
 
 public class Init
 {
-    public List<String> GeneratedSchema { get; set; }
+    public List<DataSchema> DataSchemaList { get; set; }
     public Init()
     {
         List<Type> MigrationList = AppDomain.CurrentDomain.GetAssemblies()
@@ -25,9 +25,10 @@ public class Init
             DBObject.Down();
             DBObject.Up();
         });
+
         //foreach (PropertyInfo Property in typeof(GlobalDataSchema).GetProperties().Where(Property => Property.PropertyType.IsSubclassOf(typeof(DataSchema))).ToList())
-        ObservableCollection<DataSchema> DataSchemaList = [.. typeof(GlobalDataSchema).GetFields(BindingFlags.Public | BindingFlags.Static).Where(x => typeof(DataSchema).IsAssignableFrom(x.FieldType)).Select(x => (DataSchema)x.GetValue(null)!)];
-        GeneratedSchema = [.. DataSchemaList.Select(x => new Transcriber(x).Transcribe())]; //"a generated database script ... Hopefully"
+        DataSchemaList = [.. typeof(GlobalDataSchema).GetFields(BindingFlags.Public | BindingFlags.Static).Where(x => typeof(DataSchema).IsAssignableFrom(x.FieldType)).Select(x => (DataSchema)x.GetValue(null)!)];
+        DataSchemaList.ForEach(Item => Item.DatabaseScript = new Transcriber(Item).Transcribe());
         var y = 1;
     }
 }

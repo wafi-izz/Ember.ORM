@@ -97,5 +97,9 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     {
         TransScript += DropTableQuery(TableBluePrint);
     }
+    public override String DropTableQuery(TableBluePrint TableBluePrint)
+    {
+        return $"DROP TABLE IF EXISTS \"{TableBluePrint.ObjectName}\";\n\n"; // TODO : must specify witch schema to drop to or create in to.
+    }
     #endregion
 }
