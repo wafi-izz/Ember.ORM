@@ -38,24 +38,19 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
         });
-        GlobalDataSchema.MSSQLDB.Create(TableName + "2", Table =>
+        
+        GlobalDataSchema.MSSQLDB.Alter(TableName,"NewName", Table =>
         {
-            Table.Integer("ObjectTypeID").PrimaryKey().Identity();
-            Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").OnDelete("cascade").OnUpdate("cascade");
-            Table.String("ObjectTypeName", 500).Default("Some Name Default");
-            Table.String("ObjectTypeName_AR", 500).Nullable();
-            Table.Varchar("ShortName", "max", true);
-            Table.String("ShortName_AR", 500);
-            Table.Boolean("PermissionAble").Default(false).Nullable();
-            Table.Boolean("Keyable").Default(false).Nullable();
-            Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
-            Table.RowStatement("some_name int default(11) null");
+            Table.Column("ObjectTypeID").Rename("NameColumnName");
+            Table.Column("ObjectTypeID").ChangeType("String");
+            Table.Column("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
+            Table.Column("ObjectTypeID").RemoveConstraint("constrain name to remove");
+            Table.AddColumn("NewColumn")("constrain name to remove");
         });
 
     }
     public void Down()
     {
-        GlobalDataSchema.MSSQLDB.DropTable(TableName + "2");
         GlobalDataSchema.MSSQLDB.DropTable(TableName);
         GlobalDataSchema.PostgreDB.DropTable(TableName);
     }

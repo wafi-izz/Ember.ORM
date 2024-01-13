@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Configuration;
 using System.Linq;
 using System.Reflection;
 using System.Text;
@@ -21,15 +22,16 @@ public class DataSchema
 {
     public TableSchema TableSchema { get; set; }
     //Database Informations
-    public String DatabaseName { get; set; }
+    public String ConnectionName { get; set; }
     public String DatabaseScript { get; set; }
     public String DatabaseVersion { get; set; } = "1.0"; // TODO : a global variable to control versions. maybe it should be across all DBs
     public DatabaseProviderEnum DatabaseProvider { get; set; }
-    // ...
-    public DataSchema(String DatabaseName,DatabaseProviderEnum DatabaseProvider)
+    public DataSchema(String ConnectionName)
     {
-        this.DatabaseName = DatabaseName;
-        this.DatabaseProvider = DatabaseProvider;
+        if (ConfigurationManager.ConnectionStrings[ConnectionName] == null) throw new Exception("not found Connection String");
+        if (!Enum.IsDefined(typeof(DatabaseProviderEnum), ConfigurationManager.ConnectionStrings[ConnectionName].ProviderName)) throw new Exception("not found Provider Name");
+        this.ConnectionName = ConnectionName;
+        this.DatabaseProvider = (DatabaseProviderEnum)Enum.Parse(typeof(DatabaseProviderEnum), ConfigurationManager.ConnectionStrings[ConnectionName].ProviderName, true);
         this.TableSchema = new TableSchema();
     }
     public void Create(String TableName, TableBluePrintCallBack TableBluePrint)

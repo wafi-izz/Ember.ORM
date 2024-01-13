@@ -48,7 +48,7 @@ try
 
     foreach(DataSchema Item in GeneratedDataSchema.Where(x => x.DatabaseScript != null))
     {
-        ConnectionStringManager ConnectionString2 = new ConnectionStringManager(Item.DatabaseName);
+        ConnectionStringManager ConnectionString2 = new ConnectionStringManager(Item.ConnectionName);
         DataAccess DA = new DataAccess(ConnectionString2);
         DA.Transaction.Begin();
         var tb = DA.CreateCommand(Item.DatabaseScript).ExecuteQuery();
