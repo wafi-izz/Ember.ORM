@@ -9,9 +9,11 @@ namespace Ember.DataSchemaManager.BluePrints;
 public class BluePrint
 {
     public String ObjectName { get; set; }
+    public String ObjectRename { get; set; }
     public BluePrintAction Action { get; set; }
     public BluePrint()
     {
+
     }
 }
 
@@ -21,4 +23,14 @@ public enum BluePrintAction
     Alter,
     Drop,
     Query
+}
+public enum TableBluePrintAlterationAction
+{
+    CreateColumn,
+    AlterColumnName,
+    AlterColumnType,
+    AddConstraint,
+    RemoveConstraint,
+    AddForeignKey,
+    RemoveForeignKey,
 }

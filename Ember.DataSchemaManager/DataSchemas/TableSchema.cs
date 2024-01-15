@@ -35,6 +35,16 @@ public class TableSchema
         TableBluePrint.Compose();
         TableBluePrintList.Add(TableBluePrint);
     }
+    public void Alter(String TableName,String TableRename, TableBluePrintCallBack TableBluePrintCallBack)
+    {
+        TableBluePrint TableBluePrint = new TableBluePrint();
+        TableBluePrint.Action = BluePrintAction.Create;
+        TableBluePrint.ObjectName = TableName;
+        TableBluePrint.ObjectRename = TableRename;
+        TableBluePrintCallBack.Invoke(TableBluePrint);
+        TableBluePrint.Compose();
+        TableBluePrintList.Add(TableBluePrint);
+    }
     public void Drop(String TableName)
     {
         TableBluePrint TableBluePrint = new TableBluePrint();

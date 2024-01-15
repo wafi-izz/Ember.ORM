@@ -19,22 +19,28 @@ public class TableBluePrint : BluePrint
             return ObjectName;
         }
     }
+    public String TableRename
+    {
+        get
+        {
+            return ObjectRename;
+        }
+    }
     private ColumnBluePrint Column { get; set; }
-    public List<ColumnBluePrint> Columns { get; set; }
+    public List<ColumnBluePrint> ColumnList { get; set; }
     public TableBluePrint()
     {
-        Columns = new List<ColumnBluePrint>();
+        ColumnList = new List<ColumnBluePrint>();
     }
     public void Compose()
     {
-        Columns.Add(Column);
+        ColumnList.Add(Column);
     }
-    #region DataTypes
     public void ColumnInit()
     {
         if (Column != null)
         {
-            Columns.Add(Column);
+            ColumnList.Add(Column);
             Column = new ColumnBluePrint();
         }
         else
@@ -47,6 +53,8 @@ public class TableBluePrint : BluePrint
         ColumnInit();
         Column.Statemant = Statement;
     }
+    #region Create
+    #region First Phase
     public TableBluePrint Integer(String ColumnName)
     {
         ColumnInit();
@@ -128,7 +136,7 @@ public class TableBluePrint : BluePrint
     #region Second Phase
     public TableBluePrint PrimaryKey()
     {
-        if (Columns.Count >= 1 && Columns.FirstOrDefault(x => x.IsPrimaryKey && x.ColumnName != Column.ColumnName) != null)
+        if (ColumnList.Count >= 1 && ColumnList.FirstOrDefault(x => x.IsPrimaryKey && x.ColumnName != Column.ColumnName) != null)
             throw new Exception($"the table '{TableName}' already a Primary Key assigned other than the Column '{Column.ColumnName}'");
         if (!Column.IsForeignKey)
             Column.IsPrimaryKey = true;
@@ -138,9 +146,9 @@ public class TableBluePrint : BluePrint
     }
     public TableBluePrint Identity(Int32 IncrementValue = 1, Int32 StartValue = 1)
     {
-        if (Columns.Count >= 1 && Columns.FirstOrDefault(x => x.IsIdentity && x.ColumnName != Column.ColumnName) != null)
+        if (ColumnList.Count >= 1 && ColumnList.FirstOrDefault(x => x.IsIdentity && x.ColumnName != Column.ColumnName) != null)
         {
-            List<String> IdentitiedColumns = Columns.Where(x => x.IsIdentity).Select(x => x.ColumnName).ToList<String>();
+            List<String> IdentitiedColumns = ColumnList.Where(x => x.IsIdentity).Select(x => x.ColumnName).ToList<String>();
             String IdentitiedColumnsSentance = "";
             foreach (var item in IdentitiedColumns)
             {
@@ -179,10 +187,77 @@ public class TableBluePrint : BluePrint
         return this;
     }
     #endregion
+    #endregion
+    #region Alter
+    #region First Phase
+    public TableBluePrint AlterColumn(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        return this;
+    }
+    public TableBluePrint NewColumn(String ColumnName)
+    {
+        ColumnInit();
+        Column.Action = TableBluePrintAlterationAction.CreateColumn;
+        Column.ColumnName = ColumnName;
+        return this;
+    }
+    #endregion
+    #region Second Phase
+    public void Rename(String NewName)
+    {
+        Column.Action = TableBluePrintAlterationAction.AlterColumnName;
+        Column.ColumnRename = NewName;
+    }
+    public TableBluePrint Integer()
+    {
+        Column.Action = TableBluePrintAlterationAction.AlterColumnType;
+        Integer(Column.ColumnName);
+        return this;
+    }
+    public TableBluePrint String(dynamic Length, StringType StringType = StringType.VARCHAR)
+    {
+        Column.Action = TableBluePrintAlterationAction.AlterColumnType;
+        String(Column.ColumnName,Length, StringType);
+        return this;
+    }
+    public TableBluePrint Boolean()
+    {
+        Column.Action = TableBluePrintAlterationAction.AlterColumnType;
+        Boolean(Column.ColumnName);
+        return this;
+    }
+    public TableBluePrint AddConstraint(String ConstrainQuery)
+    {
+        Column.Action = TableBluePrintAlterationAction.AddConstraint;
+        Column.ConstrainQuery = ConstrainQuery;
+        return this;
+    }
+    public TableBluePrint RemoveConstraint(String ConstrainName)
+    {
+        Column.Action = TableBluePrintAlterationAction.RemoveConstraint;
+        Column.ConstrainName = ConstrainName;
+        return this;
+    }
+    public TableBluePrint AddForeignKey()
+    {
+        Column.Action = TableBluePrintAlterationAction.AddForeignKey;
+        ForeignKey();
+        return this;
+    }
+    public void RemoveForeignKey()
+    {
+        Column.Action = TableBluePrintAlterationAction.RemoveForeignKey;
+        Column.RemovedForeignKey = true;
+    }
+    #endregion
+    #endregion
 }
 
 public class ColumnBluePrint
 {
+    public String Statemant { get; set; }
     public String ColumnName { get; set; }
     public JsonObject ColumnDataType { get; set; }
     public Boolean IsPrimaryKey { get; set; }
@@ -194,7 +269,11 @@ public class ColumnBluePrint
     public Boolean Nullable { get; set; }
     public decimal MinValue { get; set; }
     public decimal MaxValue { get; set; }
-    public String Statemant { get; set; }
+    public String ColumnRename { get; set; }
+    public String ConstrainQuery { get; set; }
+    public String ConstrainName { get; set; }
+    public Boolean RemovedForeignKey { get; set; }
+    public TableBluePrintAlterationAction Action { get; set; }
     public ColumnBluePrint()
     {
         ColumnDataType = new JsonObject();
@@ -209,7 +288,7 @@ public enum ColumnTypeEnum
     String,
     Boolean,
 }
-// aaaah ... should all the upported types be here or over at the transcriber class
+// aaaah ... should all the supported types be here or over at the transcriber class
 public enum StringType
 {
     TEXT,

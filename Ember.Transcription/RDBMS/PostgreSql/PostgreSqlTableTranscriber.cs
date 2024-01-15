@@ -35,7 +35,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     public void Create(TableBluePrint TableBluePrint)
     {
         TransScript += $"CREATE TABLE \"{TableBluePrint.TableName}\"(\n";
-        foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.Columns.Select((Column, Index) => (Column, Index + 1)))
+        foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
         {
             TransScript += "\t";
             if (Column.Statemant != null)
@@ -49,7 +49,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
                 TransScript += DefaultValue(Column);
                 TransScript += NullabilityState(Column);
             }
-            TransScript += TableBluePrint.Columns.Count > Index ? $",\n" : "\n";
+            TransScript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
         }
         TransScript += $");\n\n ";
     }

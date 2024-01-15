@@ -38,6 +38,10 @@ public class DataSchema
     {
         TableSchema.Create(TableName, TableBluePrint);
     }
+    public void Alter(String TableName,String TableRename, TableBluePrintCallBack TableBluePrint)
+    {
+        TableSchema.Alter(TableName,TableRename, TableBluePrint);
+    }
     public void DropTable(String TableName)
     {
         TableSchema.Drop(TableName);

@@ -1,6 +1,7 @@
 ﻿using Ember.DataSchemaManager.DataSchemas;
 using Ember.DataSchemaManager.Dictionaries;
 using Ember.DataSchemaManager.ObjectTypes;
+using Ember.DataSchemaManager.BluePrints;
 using Ember.DataStructure.Database;
 
 namespace Ember.DataStructure.Migrations.M_02_Tables;
@@ -38,14 +39,15 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
         });
-        
-        GlobalDataSchema.MSSQLDB.Alter(TableName,"NewName", Table =>
+        GlobalDataSchema.MSSQLDB.Alter(TableName,"NewObjectType", Table =>
         {
-            Table.Column("ObjectTypeID").Rename("NameColumnName");
-            Table.Column("ObjectTypeID").ChangeType("String");
-            Table.Column("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
-            Table.Column("ObjectTypeID").RemoveConstraint("constrain name to remove");
-            Table.AddColumn("NewColumn")("constrain name to remove");
+            Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
+            Table.AlterColumn("ObjectTypeID").String(500,StringType.NVARCHAR).Nullable();
+            Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
+            Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
+            Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
+            Table.NewColumn("NewColumn").Integer().Default(11).Nullable();
         });
 
     }
