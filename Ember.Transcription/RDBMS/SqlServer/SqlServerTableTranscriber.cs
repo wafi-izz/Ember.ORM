@@ -57,12 +57,17 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     }
     public String IDENTITY(String TableName, ColumnBluePrint Column)
     {
-        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) CONSTRAINT CHC_{TableName}_IDENTITYrANGE CHECK ({Column.ColumnName} >= {Column.MaxValue} AND {Column.ColumnName} <= {Column.MaxValue})" : "";
+        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) CONSTRAINT CHC_{TableName}_IDENTITY_RANGE CHECK ({Column.ColumnName} >= {Column.MaxValue} AND {Column.ColumnName} <= {Column.MaxValue})" : "";
     }
     #endregion
     #region Alter
     public void Alter(TableBluePrint TableBluePrint)
     {
+        List<ColumnBluePrint> OverlappedRenameAction = TableBluePrint.ColumnList.GroupBy(x => new { x.ColumnName, x.Action }).Where(x => x.Count() > 1).SelectMany(x => x).ToList();
+        if (OverlappedRenameAction.Count() > 1)
+        {
+            throw new Exception($"Table {TableBluePrint.TableName}, Column {OverlappedRenameAction.First().ColumnName}\nthere are two rename actions on this column, one is action is sufficient");
+        }
         foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
         {
             if (Column.Action == TableBluePrintAlterationAction.CreateColumn) Transcript += CreateColumn(Column, TableBluePrint.TableName);
@@ -88,7 +93,25 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     }
     public String RenameColumn(ColumnBluePrint Column, String TableName)
     {
-        return $"EXEC sp_rename '{TableName}.{Column.ColumnName}', '{Column.ColumnRename}', 'COLUMN' \n\n";
+        // TODO : Remove check constraints (for now only check constraints) first and then re add then
+        // "SELECT OBJECT_DEFINITION(object_id) AS ConstraintText FROM sys.check_constraints WHERE name = 'CHC_ObjectTypes_IDENTITYrANGE' AND parent_object_id = OBJECT_ID('ObjectTypes');"
+        Int64 CurrentTick = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        String ConstraintName = $"{Column.ColumnName}_{CurrentTick}_ConstraintName";
+        String CheckString = $"{Column.ColumnName}_{CurrentTick}_CheckString";
+        String AlterScript = "\n" + 
+            $"DECLARE @{ConstraintName} nvarchar(1000) = (SELECT cc.name AS CheckConstraintName FROM sys.check_constraints cc JOIN sys.columns c ON cc.parent_object_id = c.object_id AND cc.parent_column_id = c.column_id WHERE c.object_id = OBJECT_ID('{TableName}') AND c.name = '{Column.ColumnName}')\n" +
+            $"DECLARE @{CheckString} nvarchar(1000) = REPLACE((SELECT OBJECT_DEFINITION(object_id) AS ConstraintText FROM sys.check_constraints WHERE name = @{ConstraintName} AND parent_object_id = OBJECT_ID('{TableName}')),'{Column.ColumnName}','{Column.ColumnRename}')\n" +
+            $"if not (@{ConstraintName} = '')\n" +
+                $"\tBEGIN\n" +
+                    $"\t\tEXEC('ALTER TABLE {TableName} DROP CONSTRAINT ' + @{ConstraintName})\n" +
+                    $"\t\tEXEC sp_rename '{TableName}.{Column.ColumnName}', '{Column.ColumnRename}', 'COLUMN'\n" +
+                    $"\t\tEXEC('ALTER TABLE {TableName} ADD CONSTRAINT ' + @{ConstraintName} + ' CHECK ' + @{CheckString})\n" +
+                $"\tEND\n" +
+            $"ELSE\n" +
+                    $"\tBEGIN\n" +
+                        $"\t\tEXEC sp_rename '{TableName}.ObjectTypeID', 'NameColumnName', 'COLUMN'\n" +
+                    $"\tEND\n";
+        return $"{AlterScript}\n\n";
     }
     public String AlterColumnType(ColumnBluePrint Column, String TableName)
     {

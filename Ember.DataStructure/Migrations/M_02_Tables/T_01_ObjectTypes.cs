@@ -42,7 +42,6 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
         GlobalDataSchema.MSSQLDB.Alter(TableName,"NewObjectType", Table =>
         {
             Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
-            Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
             Table.AlterColumn("ObjectTypeID").String(500,StringType.NVARCHAR).Nullable();
             Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
             Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");

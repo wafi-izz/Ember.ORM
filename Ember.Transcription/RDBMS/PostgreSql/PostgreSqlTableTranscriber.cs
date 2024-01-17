@@ -102,18 +102,19 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     }
     public String CreateColumn(ColumnBluePrint Column, String TableName)
     {
-        String Transcript = $"Alter Table {TableName}\n\t";
+        String Transcript = $"Alter Table \"{TableName}\" \n\tAdd ";
         Transcript += ColumnHead(Column);
         Transcript += PrimaryKey(Column);
         Transcript += IDENTITY(TableName, Column);
         Transcript += ForeignKeySection(TableName, Column);
         Transcript += DefaultValue(Column);
         Transcript += NullabilityState(Column);
+        Transcript += ";\n\n";
         return Transcript;
     }
     public String RenameColumn(ColumnBluePrint Column, String TableName)
     {
-        return $"Alter Table \"{TableName}\" Rename Column {Column.ColumnName} to {Column.ColumnRename}";
+        return $"Alter Table \"{TableName}\" \n\tRename Column {Column.ColumnName} to {Column.ColumnRename};\n\n";
     }
     public String AlterColumnType(ColumnBluePrint Column, String TableName)
     {
