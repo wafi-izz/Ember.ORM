@@ -29,8 +29,8 @@ public enum TableBluePrintAlterationAction
     CreateColumn,
     AlterColumnName,
     AlterColumnType,
-    AddConstraint,
-    RemoveConstraint,
     AddForeignKey,
     RemoveForeignKey,
+    AddConstraint,
+    RemoveConstraint,
 }

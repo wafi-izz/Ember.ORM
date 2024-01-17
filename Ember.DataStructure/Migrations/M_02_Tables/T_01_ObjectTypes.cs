@@ -42,12 +42,23 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
         GlobalDataSchema.MSSQLDB.Alter(TableName,"NewObjectType", Table =>
         {
             Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
+            Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
             Table.AlterColumn("ObjectTypeID").String(500,StringType.NVARCHAR).Nullable();
             Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
             Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
             Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
             Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
-            Table.NewColumn("NewColumn").Integer().Default(11).Nullable();
+            Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
+        });
+        GlobalDataSchema.PostgreDB.Alter(TableName,"NewObjectType", Table =>
+        {
+            Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
+            Table.AlterColumn("ObjectTypeID").String(500,StringType.NVARCHAR).Nullable();
+            Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
+            Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
+            Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
+            Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
         });
 
     }

@@ -38,7 +38,7 @@ public class TableSchema
     public void Alter(String TableName,String TableRename, TableBluePrintCallBack TableBluePrintCallBack)
     {
         TableBluePrint TableBluePrint = new TableBluePrint();
-        TableBluePrint.Action = BluePrintAction.Create;
+        TableBluePrint.Action = BluePrintAction.Alter;
         TableBluePrint.ObjectName = TableName;
         TableBluePrint.ObjectRename = TableRename;
         TableBluePrintCallBack.Invoke(TableBluePrint);

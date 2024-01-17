@@ -12,6 +12,6 @@ internal class SqlServerTranscriber
     internal SqlServerTranscriber() { }
     internal String Transcribe(DataSchema Schema)
     {
-        return new SqlServerTableTranscriber(Schema.TableSchema).TransScript;
+        return new SqlServerTableTranscriber(Schema.TableSchema).Transcript;
     }
 }

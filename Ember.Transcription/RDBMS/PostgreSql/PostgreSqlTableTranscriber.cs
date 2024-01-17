@@ -14,11 +14,11 @@ namespace Ember.Transcription.RDBMS.PostgreSql;
 
 internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
 {
-    public String TransScript { get; set; }
+    public String Transcript { get; set; }
     public TableSchema TableSchema { get; set; }
     public PostgreSqlTableTranscriber(TableSchema TableSchema)
     {
-        TransScript = "";
+        Transcript = "";
         this.TableSchema = TableSchema;
         Transcribe();
     }
@@ -34,24 +34,24 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     #region Create
     public void Create(TableBluePrint TableBluePrint)
     {
-        TransScript += $"CREATE TABLE \"{TableBluePrint.TableName}\"(\n";
+        Transcript += $"CREATE TABLE \"{TableBluePrint.TableName}\"(\n";
         foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
         {
-            TransScript += "\t";
+            Transcript += "\t";
             if (Column.Statemant != null)
-                TransScript += Column.Statemant;
+                Transcript += Column.Statemant;
             else
             {
-                TransScript += ColumnHead(Column);
-                TransScript += PrimaryKey(Column);
-                TransScript += IDENTITY(TableBluePrint.TableName,Column);
-                TransScript += ForeignKeySection(TableBluePrint.TableName, Column);
-                TransScript += DefaultValue(Column);
-                TransScript += NullabilityState(Column);
+                Transcript += ColumnHead(Column);
+                Transcript += PrimaryKey(Column);
+                Transcript += IDENTITY(TableBluePrint.TableName,Column);
+                Transcript += ForeignKeySection(TableBluePrint.TableName, Column);
+                Transcript += DefaultValue(Column);
+                Transcript += NullabilityState(Column);
             }
-            TransScript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
+            Transcript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
         }
-        TransScript += $");\n\n ";
+        Transcript += $");\n\n ";
     }
     public String ColumnHead(ColumnBluePrint Column)
     {
@@ -89,13 +89,41 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     #region Alter
     public void Alter(TableBluePrint TableBluePrint)
     {
-
+        foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
+        {
+            if (Column.Action == TableBluePrintAlterationAction.CreateColumn) Transcript += CreateColumn(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.AlterColumnName) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.AlterColumnType) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.AddForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.RemoveForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.AddConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.RemoveConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+        }
+    }
+    public String CreateColumn(ColumnBluePrint Column, String TableName)
+    {
+        String Transcript = $"Alter Table {TableName}\n\t";
+        Transcript += ColumnHead(Column);
+        Transcript += PrimaryKey(Column);
+        Transcript += IDENTITY(TableName, Column);
+        Transcript += ForeignKeySection(TableName, Column);
+        Transcript += DefaultValue(Column);
+        Transcript += NullabilityState(Column);
+        return Transcript;
+    }
+    public String RenameColumn(ColumnBluePrint Column, String TableName)
+    {
+        return $"Alter Table \"{TableName}\" Rename Column {Column.ColumnName} to {Column.ColumnRename}";
+    }
+    public String AlterColumnType(ColumnBluePrint Column, String TableName)
+    {
+        return "";
     }
     #endregion
     #region Drop
     public void Drop(TableBluePrint TableBluePrint)
     {
-        TransScript += DropTableQuery(TableBluePrint);
+        Transcript += DropTableQuery(TableBluePrint);
     }
     public override String DropTableQuery(TableBluePrint TableBluePrint)
     {

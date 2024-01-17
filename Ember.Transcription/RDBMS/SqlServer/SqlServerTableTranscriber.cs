@@ -2,6 +2,7 @@
 using Ember.DataSchemaManager.DataSchemas;
 using Ember.Transcription.TranscriptionInterfaces;
 using System.Data.Common;
+using System.Runtime.InteropServices.Marshalling;
 using System.Security.Principal;
 
 namespace Ember.Transcription.RDBMS.SqlServer;
@@ -9,11 +10,11 @@ namespace Ember.Transcription.RDBMS.SqlServer;
 
 internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
 {
-    public String TransScript { get; set; }
+    public String Transcript { get; set; }
     public TableSchema TableSchema { get; set; }
     public SqlServerTableTranscriber(TableSchema TableSchema)
     {
-        TransScript = "";
+        Transcript = "";
         this.TableSchema = TableSchema;
         Transcribe();
     }
@@ -29,24 +30,24 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     #region Create
     public void Create(TableBluePrint TableBluePrint)
     {
-        TransScript += $"CREATE TABLE {TableBluePrint.TableName}(\n";
+        Transcript += $"CREATE TABLE {TableBluePrint.TableName}(\n";
         foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
         {
-            TransScript += "\t";
+            Transcript += "\t";
             if (Column.Statemant != null)
-                TransScript += Column.Statemant;
+                Transcript += Column.Statemant;
             else
             {
-                TransScript += ColumnHead(Column);
-                TransScript += PrimaryKey(Column);
-                TransScript += IDENTITY(TableBluePrint.TableName,Column);
-                TransScript += ForeignKeySection(TableBluePrint.TableName, Column);
-                TransScript += DefaultValue(Column);
-                TransScript += NullabilityState(Column);
+                Transcript += ColumnHead(Column);
+                Transcript += PrimaryKey(Column);
+                Transcript += IDENTITY(TableBluePrint.TableName, Column);
+                Transcript += ForeignKeySection(TableBluePrint.TableName, Column);
+                Transcript += DefaultValue(Column);
+                Transcript += NullabilityState(Column);
             }
-            TransScript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
+            Transcript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
         }
-        TransScript += $");\n\n ";
+        Transcript += $");\n\n ";
     }
     public String ColumnHead(ColumnBluePrint Column)
     {
@@ -54,7 +55,7 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
         String DataTypeParameter = Length != "" ? $"({Length})" : "";
         return $"{Column.ColumnName} {TranscribeDataType(Column.ColumnDataType["DataTypeName"]!.ToString(), Column.ColumnDataType["DataTypeSQLName"]!.ToString(), DataTypeParameter)} ";
     }
-    public String IDENTITY(String TableName,ColumnBluePrint Column)
+    public String IDENTITY(String TableName, ColumnBluePrint Column)
     {
         return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) CONSTRAINT CHC_{TableName}_IDENTITYrANGE CHECK ({Column.ColumnName} >= {Column.MaxValue} AND {Column.ColumnName} <= {Column.MaxValue})" : "";
     }
@@ -62,13 +63,42 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     #region Alter
     public void Alter(TableBluePrint TableBluePrint)
     {
-
+        foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
+        {
+            if (Column.Action == TableBluePrintAlterationAction.CreateColumn) Transcript += CreateColumn(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.AlterColumnName) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if (Column.Action == TableBluePrintAlterationAction.AlterColumnType) Transcript += AlterColumnType(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.AddForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.RemoveForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.AddConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            //if(Column.Action == TableBluePrintAlterationAction.RemoveConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+        }
+    }
+    public String CreateColumn(ColumnBluePrint Column, String TableName)
+    {
+        String Transcript = $"Alter Table {TableName}\n\tAdd ";
+        Transcript += ColumnHead(Column);
+        Transcript += PrimaryKey(Column);
+        Transcript += IDENTITY(TableName, Column);
+        Transcript += ForeignKeySection(TableName, Column);
+        Transcript += DefaultValue(Column);
+        Transcript += NullabilityState(Column);
+        Transcript += "\n\n";
+        return Transcript;
+    }
+    public String RenameColumn(ColumnBluePrint Column, String TableName)
+    {
+        return $"EXEC sp_rename '{TableName}.{Column.ColumnName}', '{Column.ColumnRename}', 'COLUMN' \n\n";
+    }
+    public String AlterColumnType(ColumnBluePrint Column, String TableName)
+    {
+        return "";
     }
     #endregion
     #region Drop
     public void Drop(TableBluePrint TableBluePrint)
     {
-        TransScript += DropTableQuery(TableBluePrint);
+        Transcript += DropTableQuery(TableBluePrint);
     }
     #endregion
 }

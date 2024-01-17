@@ -13,6 +13,6 @@ internal class PostgreSqlTranscriber
     internal PostgreSqlTranscriber() { }
     internal String Transcribe(DataSchema Schema)
     {
-        return new PostgreSqlTableTranscriber(Schema.TableSchema).TransScript;
+        return new PostgreSqlTableTranscriber(Schema.TableSchema).Transcript;
     }
 }

@@ -196,7 +196,7 @@ public class TableBluePrint : BluePrint
         Column.ColumnName = ColumnName;
         return this;
     }
-    public TableBluePrint NewColumn(String ColumnName)
+    public TableBluePrint CreateColumn(String ColumnName)
     {
         ColumnInit();
         Column.Action = TableBluePrintAlterationAction.CreateColumn;

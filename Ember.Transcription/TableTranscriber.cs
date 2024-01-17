@@ -4,6 +4,7 @@ using Ember.Transcription.RDBMS.SqlServer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Text.Json.Nodes;
@@ -13,6 +14,7 @@ namespace Ember.Transcription;
 
 public class TableTranscriber
 {
+    #region Create
     public virtual String PrimaryKey(ColumnBluePrint Column)
     {
         return Column.IsPrimaryKey ? "PRIMARY KEY " : "";
@@ -81,4 +83,8 @@ public class TableTranscriber
         }
         return null;
     }
+    #endregion
+    #region Alter
+
+    #endregion
 }
