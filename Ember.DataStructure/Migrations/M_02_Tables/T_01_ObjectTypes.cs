@@ -59,7 +59,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
             Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
         });
-
+        Console.WriteLine("sda");
     }
     public void Down()
     {

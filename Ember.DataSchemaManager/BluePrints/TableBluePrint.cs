@@ -27,9 +27,11 @@ public class TableBluePrint : BluePrint
         }
     }
     private ColumnBluePrint Column { get; set; }
+    private Boolean ColumnInitRequired { get; set; }
     public List<ColumnBluePrint> ColumnList { get; set; }
     public TableBluePrint()
     {
+        ColumnInitRequired = true;
         ColumnList = new List<ColumnBluePrint>();
     }
     public void Compose()
@@ -38,6 +40,12 @@ public class TableBluePrint : BluePrint
     }
     public void ColumnInit()
     {
+        if (!ColumnInitRequired)
+        {
+            ColumnInitRequired = true;
+            return;
+        }
+
         if (Column != null)
         {
             ColumnList.Add(Column);
@@ -210,21 +218,26 @@ public class TableBluePrint : BluePrint
         Column.Action = TableBluePrintAlterationAction.AlterColumnName;
         Column.ColumnRename = NewName;
     }
+    public void InitilizeAlteration()
+    {
+        if (Column.Action == null) Column.Action = TableBluePrintAlterationAction.AlterColumnType;
+        ColumnInitRequired = false;
+    }
     public TableBluePrint Integer()
     {
-        Column.Action = TableBluePrintAlterationAction.AlterColumnType;
+        InitilizeAlteration();
         Integer(Column.ColumnName);
         return this;
     }
     public TableBluePrint String(dynamic Length, StringType StringType = StringType.VARCHAR)
     {
-        Column.Action = TableBluePrintAlterationAction.AlterColumnType;
-        String(Column.ColumnName,Length, StringType);
+        InitilizeAlteration();
+        String(Column.ColumnName, Length, StringType);
         return this;
     }
     public TableBluePrint Boolean()
     {
-        Column.Action = TableBluePrintAlterationAction.AlterColumnType;
+        InitilizeAlteration();
         Boolean(Column.ColumnName);
         return this;
     }
@@ -273,7 +286,7 @@ public class ColumnBluePrint
     public String ConstrainQuery { get; set; }
     public String ConstrainName { get; set; }
     public Boolean RemovedForeignKey { get; set; }
-    public TableBluePrintAlterationAction Action { get; set; }
+    public TableBluePrintAlterationAction? Action { get; set; }
     public ColumnBluePrint()
     {
         ColumnDataType = new JsonObject();
