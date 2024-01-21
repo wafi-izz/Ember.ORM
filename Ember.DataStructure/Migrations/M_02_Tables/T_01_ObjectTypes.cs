@@ -38,6 +38,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("PermissionAble").Default(false).Nullable();
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
+            Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
         });
         GlobalDataSchema.MSSQLDB.Alter(TableName,"NewObjectType", Table =>
         {
@@ -59,7 +60,8 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
             Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
         });
-        Console.WriteLine("sda");
+        var tt = new TableBluePrint();
+        Console.ReadLine();
     }
     public void Down()
     {

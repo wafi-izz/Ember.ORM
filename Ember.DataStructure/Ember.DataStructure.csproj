@@ -5,9 +5,10 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GeneratePackageOnBuild>False</GeneratePackageOnBuild>
-		
 	</PropertyGroup>
 
+
+	
 	<ItemGroup>
 	  <Content Include=".template.config\template.json" />
 	</ItemGroup>
@@ -25,7 +26,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Ember.CodeAnalysis\Ember.CodeAnalysis\Ember.CodeAnalysis.csproj" >
+			<ReferenceOutputAssembly>false</ReferenceOutputAssembly>
+			<OutputItemType>Analyzer</OutputItemType>
+		</ProjectReference>
 	  <ProjectReference Include="..\Ember.Transcription\Ember.Transcription.csproj" />
 	</ItemGroup>
-
 </Project>
