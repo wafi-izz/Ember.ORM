@@ -26,78 +26,67 @@ namespace Ember.CodeAnalysis
 
         public override void Initialize(AnalysisContext context)
         {
+            context.RegisterSyntaxNodeAction(SomeName, SyntaxKind.InvocationExpression);
+        }
+        public void SomeName(SyntaxNodeAnalysisContext context)
+        {
+
         }
     }
-
-
     //write line
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConsoleWriteAnalyzer : DiagnosticAnalyzer
     {
         public const string DiagnosticId = "CW001";
-        internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, "Avoid using Console.WriteLine", "Consider using a logging framework instead", "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
-
+        internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, "Avoid using Console.WriteLine", "Consider Using a Logging Framework '{0}' ", "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
-
         public override void Initialize(AnalysisContext Context)
         {
             System.Diagnostics.Debug.WriteLine("Analyzer is running");
             Context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.InvocationExpression);
         }
-
         private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
         {
             var invocationExpression = (InvocationExpressionSyntax)Context.Node;
-
             var memberAccessExpression = invocationExpression.Expression as MemberAccessExpressionSyntax;
             if (memberAccessExpression == null)
                 return;
+            var mm = memberAccessExpression.Name.Identifier.Text;
 
-            var methodName = memberAccessExpression.Name.Identifier.Text;
-
-
-            //if (methodName == "CreateColumn" && memberAccessExpression.Expression.ToString() == "Table")
+            //if (mm == "CreateColumn" && memberAccessExpression.Expression.ToString() == "Table")
             //{
             //    var diagnostic = Diagnostic.Create(Rule, invocationExpression.GetLocation(), "zzzz zzzz zzz zzz erroe zzzz");
             //    Context.ReportDiagnostic(diagnostic);
             //}
 
-            var invocation = (InvocationExpressionSyntax)Context.Node;
-            var methodSymbol = Context.SemanticModel.GetSymbolInfo(invocation).Symbol as IMethodSymbol;
-
+            MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)invocationExpression.Expression;
             // Check if the method symbol is not null and it is the DataSchema.Create method
-            if (methodSymbol != null &&
-                methodSymbol.Name == "Create" &&
-                methodSymbol.ContainingType?.Name == "DataSchema")
+            if (MethodName.Name.Identifier.Text == "Create")
             {
-                // Get the callback parameter (second argument of Create method)
-                var callbackArgument = invocation.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression as LambdaExpressionSyntax;
-
-                // Check if the callback parameter is a LambdaExpressionSyntax
-                if (callbackArgument != null)
+                IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
+                if (methodSymbol.ContainingType?.Name == "DataSchema")
                 {
-                    // Check if CreateColumn is called inside the callback
-                    var createColumnCalls = callbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                        .Where(invocationSyntax =>
-                        {
-                            var createColumnSymbol = Context.SemanticModel.GetSymbolInfo(invocationSyntax).Symbol as IMethodSymbol;
-                            return createColumnSymbol != null && createColumnSymbol.Name == "CreateColumn";
-                        });
-
-                    foreach (var createColumnCall in createColumnCalls)
+                    // Get the callback parameter (second argument of Create method)
+                    LambdaExpressionSyntax callbackArgument = (LambdaExpressionSyntax)invocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
+                    // Check if the callback parameter is a LambdaExpressionSyntax
+                    if (callbackArgument != null)
                     {
-                        Context.ReportDiagnostic(Diagnostic.Create(Rule, createColumnCall.GetLocation()));
+                        // Check if CreateColumn is called inside the callback
+                        List<InvocationExpressionSyntax> CreateColumnCalls = callbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                            .Where(invocationSyntax => (invocationSyntax.Expression as MemberAccessExpressionSyntax).Name.Identifier.Text == "CreateColumn").ToList();
+                        foreach (InvocationExpressionSyntax createColumnCall in CreateColumnCalls)
+                        {
+                            Context.ReportDiagnostic(Diagnostic.Create(Rule, createColumnCall.GetLocation(), "name =>" + MethodName.GetType().ToString()));
+                        }
                     }
                 }
             }
-
             //InvocationExpressionSyntax IES = (InvocationExpressionSyntax)Context.Node;
             //MemberAccessExpressionSyntax MA = (MemberAccessExpressionSyntax)IES.Expression;
             //if (MA.Name.Identifier.Text == "ReadLine" && MA.Expression.ToString() == "Console")
             //{
             //    Context.ReportDiagnostic(Diagnostic.Create(Rule, IES.GetLocation(), "some message zzzzzz"));
             //}
-
         }
     }
 
