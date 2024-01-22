@@ -12,28 +12,7 @@ using System.Threading;
 
 namespace Ember.CodeAnalysis
 {
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class MigrationChainedFunctionsAnalyzer : DiagnosticAnalyzer
-    {
-        public const string DiagnosticId = "MigrationChainedFunctionsAnalyzer";
-        internal static readonly LocalizableString Title = "MigrationChainedFunctionsAnalyzer Title";
-        internal static readonly LocalizableString MessageFormat = "MigrationChainedFunctionsAnalyzer '{0}'";
-        internal const string Category = "MigrationChainedFunctionsAnalyzer Category";
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
-
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
-
-        public override void Initialize(AnalysisContext context)
-        {
-            context.RegisterSyntaxNodeAction(SomeName, SyntaxKind.InvocationExpression);
-        }
-        public void SomeName(SyntaxNodeAnalysisContext context)
-        {
-
-        }
-    }
-    //write line
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
     public class ConsoleWriteAnalyzer : DiagnosticAnalyzer
     {
@@ -47,18 +26,7 @@ namespace Ember.CodeAnalysis
         }
         private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
         {
-            var invocationExpression = (InvocationExpressionSyntax)Context.Node;
-            var memberAccessExpression = invocationExpression.Expression as MemberAccessExpressionSyntax;
-            if (memberAccessExpression == null)
-                return;
-            var mm = memberAccessExpression.Name.Identifier.Text;
-
-            //if (mm == "CreateColumn" && memberAccessExpression.Expression.ToString() == "Table")
-            //{
-            //    var diagnostic = Diagnostic.Create(Rule, invocationExpression.GetLocation(), "zzzz zzzz zzz zzz erroe zzzz");
-            //    Context.ReportDiagnostic(diagnostic);
-            //}
-
+            InvocationExpressionSyntax invocationExpression = (InvocationExpressionSyntax)Context.Node;
             MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)invocationExpression.Expression;
             // Check if the method symbol is not null and it is the DataSchema.Create method
             if (MethodName.Name.Identifier.Text == "Create")
@@ -80,13 +48,29 @@ namespace Ember.CodeAnalysis
                         }
                     }
                 }
-            }
-            //InvocationExpressionSyntax IES = (InvocationExpressionSyntax)Context.Node;
-            //MemberAccessExpressionSyntax MA = (MemberAccessExpressionSyntax)IES.Expression;
-            //if (MA.Name.Identifier.Text == "ReadLine" && MA.Expression.ToString() == "Console")
-            //{
-            //    Context.ReportDiagnostic(Diagnostic.Create(Rule, IES.GetLocation(), "some message zzzzzz"));
-            //}
+            }  
+        }
+    }
+    #region Reference Code
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class MigrationChainedFunctionsAnalyzer : DiagnosticAnalyzer
+    {
+        public const string DiagnosticId = "MigrationChainedFunctionsAnalyzer";
+        internal static readonly LocalizableString Title = "MigrationChainedFunctionsAnalyzer Title";
+        internal static readonly LocalizableString MessageFormat = "MigrationChainedFunctionsAnalyzer '{0}'";
+        internal const string Category = "MigrationChainedFunctionsAnalyzer Category";
+
+        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+
+        public override void Initialize(AnalysisContext context)
+        {
+            context.RegisterSyntaxNodeAction(SomeName, SyntaxKind.InvocationExpression);
+        }
+        public void SomeName(SyntaxNodeAnalysisContext context)
+        {
+
         }
     }
 
@@ -125,5 +109,25 @@ namespace Ember.CodeAnalysis
             }
 
         }
+
+
+
+        //var mm = memberAccessExpression.Name.Identifier.Text;
+        //if (mm == "CreateColumn" && memberAccessExpression.Expression.ToString() == "Table")
+        //{
+        //    var diagnostic = Diagnostic.Create(Rule, invocationExpression.GetLocation(), "zzzz zzzz zzz zzz erroe zzzz");
+        //    Context.ReportDiagnostic(diagnostic);
+        //}
+
+
+        //InvocationExpressionSyntax IES = (InvocationExpressionSyntax)Context.Node;
+        //MemberAccessExpressionSyntax MA = (MemberAccessExpressionSyntax)IES.Expression;
+        //if (MA.Name.Identifier.Text == "ReadLine" && MA.Expression.ToString() == "Console")
+        //{
+        //    Context.ReportDiagnostic(Diagnostic.Create(Rule, IES.GetLocation(), "some message zzzzzz"));
+        //}
+
+
     }
+    #endregion
 }
