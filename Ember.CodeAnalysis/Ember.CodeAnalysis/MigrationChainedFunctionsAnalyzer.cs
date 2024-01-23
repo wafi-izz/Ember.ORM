@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis.Diagnostics;
 using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
@@ -12,34 +13,28 @@ using System.Threading;
 
 namespace Ember.CodeAnalysis
 {
-
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class ConsoleWriteAnalyzer : DiagnosticAnalyzer
+    public class CreateAlterRelatedMethods : DiagnosticAnalyzer
     {
-        public const string DiagnosticId = "CW001";
-        internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, "Avoid using Console.WriteLine", "Consider Using a Logging Framework '{0}' ", "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
+        public const string DiagnosticId = "MT001";
+        internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, "Function Is Not Allowed In This Operation", "'{0}' ", "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
         public override void Initialize(AnalysisContext Context)
         {
-            System.Diagnostics.Debug.WriteLine("Analyzer is running");
             Context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.InvocationExpression);
         }
         private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
         {
             InvocationExpressionSyntax invocationExpression = (InvocationExpressionSyntax)Context.Node;
             MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)invocationExpression.Expression;
-            // Check if the method symbol is not null and it is the DataSchema.Create method
             if (MethodName.Name.Identifier.Text == "Create")
             {
                 IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
                 if (methodSymbol.ContainingType?.Name == "DataSchema")
                 {
-                    // Get the callback parameter (second argument of Create method)
                     LambdaExpressionSyntax callbackArgument = (LambdaExpressionSyntax)invocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
-                    // Check if the callback parameter is a LambdaExpressionSyntax
                     if (callbackArgument != null)
                     {
-                        // Check if CreateColumn is called inside the callback
                         List<InvocationExpressionSyntax> CreateColumnCalls = callbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
                             .Where(invocationSyntax => (invocationSyntax.Expression as MemberAccessExpressionSyntax).Name.Identifier.Text == "CreateColumn").ToList();
                         foreach (InvocationExpressionSyntax createColumnCall in CreateColumnCalls)
@@ -48,7 +43,50 @@ namespace Ember.CodeAnalysis
                         }
                     }
                 }
-            }  
+            }
+            //TODO: List other similar cases.
+        }
+    }
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class RelatedMethodChaining : DiagnosticAnalyzer
+    {
+        public const string DiagnosticId = "MT002";
+        internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, "Function Is Not Allowed In This Order", "'{0}' ", "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override void Initialize(AnalysisContext Context)
+        {
+            Context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.InvocationExpression);
+        }
+        private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
+        {
+            InvocationExpressionSyntax InvocationExpression = (InvocationExpressionSyntax)Context.Node;
+            MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)InvocationExpression.Expression;
+            if (MethodName.Name.Identifier.Text == "Create")
+            {
+                IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
+                if (methodSymbol.ContainingType?.Name == "DataSchema")
+                {
+                    // find the primary key.
+                    LambdaExpressionSyntax CallbackArgument = (LambdaExpressionSyntax)InvocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
+                    if (CallbackArgument != null)
+                    {
+                        List<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                        .Where(MemberAccess =>
+                            MemberAccess.Name.ToString() == "Identity" &&
+                            MemberAccess.Expression is InvocationExpressionSyntax &&
+                            !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".Integer"))
+                        .Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression)
+                        .ToList();
+                        foreach (InvocationExpressionSyntax PKCall in PKCallList)
+                        {
+                            Context.ReportDiagnostic(Diagnostic.Create(Rule, PKCall.GetLocation(), "Identity column 'id' must be of data type int, bigint, smallint, tinyint, or decimal or numeric with a scale of 0"));
+                        }
+                    }
+                    // if found see if it is on the first chain 
+                    // if found see if her ancestor is something other than an integer type
+                }
+            }
+            //TODO: List other similar cases.
         }
     }
     #region Reference Code

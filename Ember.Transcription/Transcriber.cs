@@ -20,8 +20,6 @@ public class Transcriber
     }
     public String Transcribe()
     {
-        // TODO : when transcribing any SQL DB type make a rule function to mkae it more adhesive to that SQL Provider type. 
-        // TODO : find out what he meant above. 
         if (DatabaseProvider == DatabaseProviderEnum.SqlServer) return new SqlServerTranscriber().Transcribe(Schema);
         if (DatabaseProvider == DatabaseProviderEnum.PostgreSql) return new PostgreSqlTranscriber().Transcribe(Schema);
         return null!;

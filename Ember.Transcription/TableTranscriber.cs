@@ -72,7 +72,7 @@ public class TableTranscriber
             if (ColumnDataType == ColumnTypeEnum.String.ToString())
             {
                 if (new String[] { StringType.VARCHAR.ToString(), StringType.CHAR.ToString(), StringType.TEXT.ToString(), StringType.NTEXT.ToString() }.Contains(SpecifiColumnDataType.ToUpper())) return $"{SpecifiColumnDataType}{Length}";
-                // TODO : find a wat to collation nvarchar for postgre
+                //TODO: find a wat to collation Nvarchar for postgre
                 if (new String[] { StringType.NVARCHAR.ToString(), StringType.NCHAR.ToString() }.Contains(SpecifiColumnDataType.ToUpper())) return $"{SpecifiColumnDataType.Substring(1)}{Length} /*A NATIONALIZED DATATYPE IS COMMING*/";
             }
             else if (ColumnDataType == ColumnTypeEnum.Boolean.ToString())
