@@ -18,7 +18,11 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
         GlobalDataSchema.PostgreDB.Create(TableName, Table =>
         {
             Table.Integer("ObjectTypeID").PrimaryKey().Identity().Min(1).Max(100);
+            Table.String("ObjectTypeID").PrimaryKey().Identity().Min(1).Max(100);
             Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.Integer("ObjectTypeParentID").References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").Constraint("some_custom_name");
+            Table.Integer("ObjectTypeParentID").ForeignKey().On("ObjectTypes").Constraint("some_custom_name");
             Table.String("ObjectTypeName", 500).Default("Some Name Default");
             Table.String("ObjectTypeName_AR", 500).Nullable();
             Table.Varchar("ShortName", "max");

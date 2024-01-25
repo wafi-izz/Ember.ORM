@@ -66,24 +66,48 @@ namespace Ember.CodeAnalysis
                 IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
                 if (methodSymbol.ContainingType?.Name == "DataSchema")
                 {
-                    // find the primary key.
+                    // find the Identity DataType.
                     LambdaExpressionSyntax CallbackArgument = (LambdaExpressionSyntax)InvocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
                     if (CallbackArgument != null)
                     {
-                        List<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                        .Where(MemberAccess =>
-                            MemberAccess.Name.ToString() == "Identity" &&
-                            MemberAccess.Expression is InvocationExpressionSyntax &&
-                            !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".Integer"))
-                        .Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression)
-                        .ToList();
-                        foreach (InvocationExpressionSyntax PKCall in PKCallList)
+                        //List<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                        //.Where(MemberAccess =>
+                        //    MemberAccess.Name.ToString() == "Identity" &&
+                        //    MemberAccess.Expression is InvocationExpressionSyntax &&
+                        //    !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".Integer"))
+                        //.Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression)
+                        //.ToList();
+                        //foreach (InvocationExpressionSyntax PKCall in PKCallList)
+                        //{
+                        //    Context.ReportDiagnostic(Diagnostic.Create(Rule, PKCall.GetLocation(), "Identity column must be of data type Integer Decimal or Numeric"));
+                        //}
+                        //if foreign key make sure all necessary function are present
+                        //ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+                        foreach (MemberAccessExpressionSyntax FKCall in CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>().Where(x => x.Name.ToString() == "Integer" && x.Expression is InvocationExpressionSyntax).Select(x => (MemberAccessExpressionSyntax)x))
                         {
-                            Context.ReportDiagnostic(Diagnostic.Create(Rule, PKCall.GetLocation(), "Identity column 'id' must be of data type int, bigint, smallint, tinyint, or decimal or numeric with a scale of 0"));
+                            Context.ReportDiagnostic(Diagnostic.Create(Rule, FKCall.GetLocation(), FKCall.Name.ToString()));
                         }
+                        //List<InvocationExpressionSyntax>  FKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                        //.Where(MemberAccess =>
+                        //{
+                        //    if (MemberAccess.Name.ToString() == "ForeignKey" && MemberAccess.Expression is InvocationExpressionSyntax)
+                        //        return true; // !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".References") || ((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".On");
+                        //    if (MemberAccess.Name.ToString() == "References" && MemberAccess.Expression is InvocationExpressionSyntax)
+                        //        return true; // !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".ForeignKey") || ((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".On");
+                        //    if (MemberAccess.Name.ToString() == "On" && MemberAccess.Expression is InvocationExpressionSyntax)
+                        //        return true; // !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".ForeignKey") || ((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".References");
+                        //    else
+                        //        return false;
+                        //})
+                        //.Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression)
+                        //.ToList();
+                        //foreach (InvocationExpressionSyntax FKCall in FKCallList)
+                        //{
+                        //    //Context.ReportDiagnostic(Diagnostic.Create(Rule, FKCall.GetLocation(), $"{FKCall.Expression.ToString()} ----- ForeignKey Must include all Related Functions"));
+                        //}
+                        // if found see if it is on the first chain 
+                        // if found see if her ancestor is something other than an integer type
                     }
-                    // if found see if it is on the first chain 
-                    // if found see if her ancestor is something other than an integer type
                 }
             }
             //TODO: List other similar cases.
