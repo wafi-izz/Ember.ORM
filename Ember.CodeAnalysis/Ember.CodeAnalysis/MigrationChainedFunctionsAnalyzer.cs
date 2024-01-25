@@ -70,6 +70,28 @@ namespace Ember.CodeAnalysis
                     LambdaExpressionSyntax CallbackArgument = (LambdaExpressionSyntax)InvocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
                     if (CallbackArgument != null)
                     {
+
+
+                        var block = CallbackArgument.Body;
+                        var methodCalls = block.DescendantNodes().OfType<InvocationExpressionSyntax>();
+
+                        var tableNames = new HashSet<string>();
+
+                        foreach (var methodCall in methodCalls)
+                        {
+                            if (methodCall.Expression is MemberAccessExpressionSyntax memberAccess &&
+                                memberAccess.Expression is IdentifierNameSyntax identifier &&
+                                identifier.Identifier.Text == "Table")
+                            {
+                                var tableName = methodCall.ArgumentList.Arguments.FirstOrDefault()?.ToString();
+                               
+                                    
+                                        var diagnostic = Diagnostic.Create(Rule, methodCall.GetLocation(), tableName);
+                                        Context.ReportDiagnostic(diagnostic);
+                                    
+                                
+                            }
+                        }
                         //List<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
                         //.Where(MemberAccess =>
                         //    MemberAccess.Name.ToString() == "Identity" &&
