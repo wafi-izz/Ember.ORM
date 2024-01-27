@@ -57,78 +57,57 @@ namespace Ember.CodeAnalysis
         {
             Context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.InvocationExpression);
         }
+        public Int32 CountChainedFunctions(InvocationExpressionSyntax invocationExpression)
+        {
+            int count = 0;
+            ExpressionSyntax expression = invocationExpression.Expression;
+            while (expression is MemberAccessExpressionSyntax memberAccess)
+            {
+                count++;
+                expression = memberAccess.Expression;
+            }
+            count++;
+            return count;
+        }
         private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
         {
             InvocationExpressionSyntax InvocationExpression = (InvocationExpressionSyntax)Context.Node;
             MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)InvocationExpression.Expression;
             if (MethodName.Name.Identifier.Text == "Create")
             {
-                IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
-                if (methodSymbol.ContainingType?.Name == "DataSchema")
+                IMethodSymbol MethodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
+                if (MethodSymbol.ContainingType?.Name == "DataSchema")
                 {
-                    // find the Identity DataType.
+                    // * identity datatype is only integer 
                     LambdaExpressionSyntax CallbackArgument = (LambdaExpressionSyntax)InvocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
                     if (CallbackArgument != null)
                     {
-
-
-                        var block = CallbackArgument.Body;
-                        var methodCalls = block.DescendantNodes().OfType<InvocationExpressionSyntax>();
-
-                        var tableNames = new HashSet<string>();
-
-                        foreach (var methodCall in methodCalls)
+                        IEnumerable<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
+                            .Where(MemberAccess =>
+                                    MemberAccess.Name.ToString() == "Identity" &&
+                                    MemberAccess.Expression is InvocationExpressionSyntax &&
+                                    !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".Integer"))
+                            .Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression);
+                        foreach (InvocationExpressionSyntax PKCall in PKCallList)
                         {
-                            if (methodCall.Expression is MemberAccessExpressionSyntax memberAccess &&
-                                memberAccess.Expression is IdentifierNameSyntax identifier &&
-                                identifier.Identifier.Text == "Table")
+                            Context.ReportDiagnostic(Diagnostic.Create(Rule, PKCall.GetLocation(), "Identity column must be of data type Integer Decimal or Numeric"));
+                        }
+                        // * foreign key must include all related function
+                        var ChainedMethodsList = CallbackArgument.Body.DescendantNodes().OfType<InvocationExpressionSyntax>();
+                        foreach ((InvocationExpressionSyntax ChainedMethods, Int32 Index) in ChainedMethodsList.Select((methodCall, Index) => (methodCall, Index)))
+                        {
+                            if (ChainedMethods.Parent is ExpressionStatementSyntax)
                             {
-                                var tableName = methodCall.ArgumentList.Arguments.FirstOrDefault()?.ToString();
-                               
-                                    
-                                        var diagnostic = Diagnostic.Create(Rule, methodCall.GetLocation(), tableName);
-                                        Context.ReportDiagnostic(diagnostic);
-                                    
-                                
+                                foreach (InvocationExpressionSyntax LinkMethod in ChainedMethods.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                    .Where(Method => new String[] { "ForeignKey", "References", "On" }.Contains(((MemberAccessExpressionSyntax)Method.Expression).Name.ToString())))
+                                {
+                                    if (LinkMethod.Parent.Parent.Parent is ExpressionStatementSyntax)
+                                        if (!LinkMethod.ToString().Contains("ForeignKey") || !LinkMethod.ToString().Contains("References") || !LinkMethod.ToString().Contains("On"))
+                                            Context.ReportDiagnostic(Diagnostic.Create(Rule, LinkMethod.GetLocation(), LinkMethod));
+                                }
                             }
                         }
-                        //List<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                        //.Where(MemberAccess =>
-                        //    MemberAccess.Name.ToString() == "Identity" &&
-                        //    MemberAccess.Expression is InvocationExpressionSyntax &&
-                        //    !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".Integer"))
-                        //.Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression)
-                        //.ToList();
-                        //foreach (InvocationExpressionSyntax PKCall in PKCallList)
-                        //{
-                        //    Context.ReportDiagnostic(Diagnostic.Create(Rule, PKCall.GetLocation(), "Identity column must be of data type Integer Decimal or Numeric"));
-                        //}
-                        //if foreign key make sure all necessary function are present
-                        //ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
-                        foreach (MemberAccessExpressionSyntax FKCall in CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>().Where(x => x.Name.ToString() == "Integer" && x.Expression is InvocationExpressionSyntax).Select(x => (MemberAccessExpressionSyntax)x))
-                        {
-                            Context.ReportDiagnostic(Diagnostic.Create(Rule, FKCall.GetLocation(), FKCall.Name.ToString()));
-                        }
-                        //List<InvocationExpressionSyntax>  FKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
-                        //.Where(MemberAccess =>
-                        //{
-                        //    if (MemberAccess.Name.ToString() == "ForeignKey" && MemberAccess.Expression is InvocationExpressionSyntax)
-                        //        return true; // !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".References") || ((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".On");
-                        //    if (MemberAccess.Name.ToString() == "References" && MemberAccess.Expression is InvocationExpressionSyntax)
-                        //        return true; // !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".ForeignKey") || ((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".On");
-                        //    if (MemberAccess.Name.ToString() == "On" && MemberAccess.Expression is InvocationExpressionSyntax)
-                        //        return true; // !((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".ForeignKey") || ((InvocationExpressionSyntax)MemberAccess.Expression).ToString().Contains(".References");
-                        //    else
-                        //        return false;
-                        //})
-                        //.Select(MemberAccess => (InvocationExpressionSyntax)MemberAccess.Expression)
-                        //.ToList();
-                        //foreach (InvocationExpressionSyntax FKCall in FKCallList)
-                        //{
-                        //    //Context.ReportDiagnostic(Diagnostic.Create(Rule, FKCall.GetLocation(), $"{FKCall.Expression.ToString()} ----- ForeignKey Must include all Related Functions"));
-                        //}
-                        // if found see if it is on the first chain 
-                        // if found see if her ancestor is something other than an integer type
+
                     }
                 }
             }
@@ -136,82 +115,82 @@ namespace Ember.CodeAnalysis
         }
     }
     #region Reference Code
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class MigrationChainedFunctionsAnalyzer : DiagnosticAnalyzer
-    {
-        public const string DiagnosticId = "MigrationChainedFunctionsAnalyzer";
-        internal static readonly LocalizableString Title = "MigrationChainedFunctionsAnalyzer Title";
-        internal static readonly LocalizableString MessageFormat = "MigrationChainedFunctionsAnalyzer '{0}'";
-        internal const string Category = "MigrationChainedFunctionsAnalyzer Category";
+    //[DiagnosticAnalyzer(LanguageNames.CSharp)]
+    //public class MigrationChainedFunctionsAnalyzer : DiagnosticAnalyzer
+    //{
+    //    public const string DiagnosticId = "MigrationChainedFunctionsAnalyzer";
+    //    internal static readonly LocalizableString Title = "MigrationChainedFunctionsAnalyzer Title";
+    //    internal static readonly LocalizableString MessageFormat = "MigrationChainedFunctionsAnalyzer '{0}'";
+    //    internal const string Category = "MigrationChainedFunctionsAnalyzer Category";
 
-        internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
+    //    internal static DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, Title, MessageFormat, Category, DiagnosticSeverity.Warning, true);
 
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+    //    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
 
-        public override void Initialize(AnalysisContext context)
-        {
-            context.RegisterSyntaxNodeAction(SomeName, SyntaxKind.InvocationExpression);
-        }
-        public void SomeName(SyntaxNodeAnalysisContext context)
-        {
+    //    public override void Initialize(AnalysisContext context)
+    //    {
+    //        context.RegisterSyntaxNodeAction(SomeName, SyntaxKind.InvocationExpression);
+    //    }
+    //    public void SomeName(SyntaxNodeAnalysisContext context)
+    //    {
 
-        }
-    }
+    //    }
+    //}
 
-    [DiagnosticAnalyzer(LanguageNames.CSharp)]
-    public class Custom1 : DiagnosticAnalyzer
-    {
-        public const string DiagnosticId = "CC002";
-        private const string Category = "Usage";
+    //[DiagnosticAnalyzer(LanguageNames.CSharp)]
+    //public class Custom1 : DiagnosticAnalyzer
+    //{
+    //    public const string DiagnosticId = "CC002";
+    //    private const string Category = "Usage";
 
-        private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
-            DiagnosticId,
-            "abc.",
-            "abc. 22",
-            Category,
-            DiagnosticSeverity.Error,
-            isEnabledByDefault: true,
-            description: "abc cc.");
-        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
-        public override void Initialize(AnalysisContext Context)
-        {
-            Context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.InvocationExpression);
-        }
-        private static void AnalyzeSyntax(SyntaxNodeAnalysisContext Context)
-        {
-            MethodDeclarationSyntax MethodDeclaration = (MethodDeclarationSyntax)Context.Node;
-            if (MethodDeclaration.Identifier.Text == "Create")
-            {
-                List<InvocationExpressionSyntax> InvocationList = MethodDeclaration.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
-                foreach (InvocationExpressionSyntax Invocation in InvocationList)
-                {
-                    if (Invocation.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name.Identifier.Text == "CreateColumn")
-                    {
-                        Context.ReportDiagnostic(Diagnostic.Create(Rule, Invocation.GetLocation()));
-                    }
-                }
-            }
+    //    private static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(
+    //        DiagnosticId,
+    //        "abc.",
+    //        "abc. 22",
+    //        Category,
+    //        DiagnosticSeverity.Error,
+    //        isEnabledByDefault: true,
+    //        description: "abc cc.");
+    //    public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+    //    public override void Initialize(AnalysisContext Context)
+    //    {
+    //        Context.RegisterSyntaxNodeAction(AnalyzeSyntax, SyntaxKind.InvocationExpression);
+    //    }
+    //    private static void AnalyzeSyntax(SyntaxNodeAnalysisContext Context)
+    //    {
+    //        MethodDeclarationSyntax MethodDeclaration = (MethodDeclarationSyntax)Context.Node;
+    //        if (MethodDeclaration.Identifier.Text == "Create")
+    //        {
+    //            List<InvocationExpressionSyntax> InvocationList = MethodDeclaration.DescendantNodes().OfType<InvocationExpressionSyntax>().ToList();
+    //            foreach (InvocationExpressionSyntax Invocation in InvocationList)
+    //            {
+    //                if (Invocation.Expression is MemberAccessExpressionSyntax memberAccess && memberAccess.Name.Identifier.Text == "CreateColumn")
+    //                {
+    //                    Context.ReportDiagnostic(Diagnostic.Create(Rule, Invocation.GetLocation()));
+    //                }
+    //            }
+    //        }
 
-        }
-
-
-
-        //var mm = memberAccessExpression.Name.Identifier.Text;
-        //if (mm == "CreateColumn" && memberAccessExpression.Expression.ToString() == "Table")
-        //{
-        //    var diagnostic = Diagnostic.Create(Rule, invocationExpression.GetLocation(), "zzzz zzzz zzz zzz erroe zzzz");
-        //    Context.ReportDiagnostic(diagnostic);
-        //}
+    //    }
 
 
-        //InvocationExpressionSyntax IES = (InvocationExpressionSyntax)Context.Node;
-        //MemberAccessExpressionSyntax MA = (MemberAccessExpressionSyntax)IES.Expression;
-        //if (MA.Name.Identifier.Text == "ReadLine" && MA.Expression.ToString() == "Console")
-        //{
-        //    Context.ReportDiagnostic(Diagnostic.Create(Rule, IES.GetLocation(), "some message zzzzzz"));
-        //}
+
+    //    //var mm = memberAccessExpression.Name.Identifier.Text;
+    //    //if (mm == "CreateColumn" && memberAccessExpression.Expression.ToString() == "Table")
+    //    //{
+    //    //    var diagnostic = Diagnostic.Create(Rule, invocationExpression.GetLocation(), "zzzz zzzz zzz zzz erroe zzzz");
+    //    //    Context.ReportDiagnostic(diagnostic);
+    //    //}
 
 
-    }
+    //    //InvocationExpressionSyntax IES = (InvocationExpressionSyntax)Context.Node;
+    //    //MemberAccessExpressionSyntax MA = (MemberAccessExpressionSyntax)IES.Expression;
+    //    //if (MA.Name.Identifier.Text == "ReadLine" && MA.Expression.ToString() == "Console")
+    //    //{
+    //    //    Context.ReportDiagnostic(Diagnostic.Create(Rule, IES.GetLocation(), "some message zzzzzz"));
+    //    //}
+
+
+    //}
     #endregion
 }
