@@ -43,7 +43,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
         {
             Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
             Table.AlterColumn("ObjectTypeID").String(500,StringType.NVARCHAR).Nullable();
-            Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentance)");
+            Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentence)");
             Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
             Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
             Table.AlterColumn("ObjectTypeID").RemoveForeignKey();

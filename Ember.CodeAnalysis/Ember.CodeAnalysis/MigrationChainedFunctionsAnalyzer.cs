@@ -27,6 +27,7 @@ namespace Ember.CodeAnalysis
         {
             InvocationExpressionSyntax invocationExpression = (InvocationExpressionSyntax)Context.Node;
             MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)invocationExpression.Expression;
+            #region Table Create Function
             if (MethodName.Name.Identifier.Text == "Create")
             {
                 IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
@@ -35,15 +36,18 @@ namespace Ember.CodeAnalysis
                     LambdaExpressionSyntax callbackArgument = (LambdaExpressionSyntax)invocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
                     if (callbackArgument != null)
                     {
+                        #region Alter specific Functions
                         List<InvocationExpressionSyntax> CreateColumnCalls = callbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                            .Where(invocationSyntax => (invocationSyntax.Expression as MemberAccessExpressionSyntax).Name.Identifier.Text == "CreateColumn").ToList();
+                            .Where(invocationSyntax => new String[] { "CreateColumn", "AlterColumn" }.Contains((invocationSyntax.Expression as MemberAccessExpressionSyntax).Name.Identifier.Text)).ToList();
                         foreach (InvocationExpressionSyntax createColumnCall in CreateColumnCalls)
                         {
-                            Context.ReportDiagnostic(Diagnostic.Create(Rule, createColumnCall.GetLocation(), "name =>" + MethodName.GetType().ToString()));
+                            Context.ReportDiagnostic(Diagnostic.Create(Rule, createColumnCall.GetLocation(), "this method can only be used inside an 'Alter' function"));
                         }
+                        #endregion
                     }
                 }
             }
+            #endregion
             //TODO: List other similar cases.
         }
     }
@@ -57,31 +61,20 @@ namespace Ember.CodeAnalysis
         {
             Context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.InvocationExpression);
         }
-        public Int32 CountChainedFunctions(InvocationExpressionSyntax invocationExpression)
-        {
-            int count = 0;
-            ExpressionSyntax expression = invocationExpression.Expression;
-            while (expression is MemberAccessExpressionSyntax memberAccess)
-            {
-                count++;
-                expression = memberAccess.Expression;
-            }
-            count++;
-            return count;
-        }
         private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
         {
             InvocationExpressionSyntax InvocationExpression = (InvocationExpressionSyntax)Context.Node;
             MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)InvocationExpression.Expression;
+            #region Table Create Function
             if (MethodName.Name.Identifier.Text == "Create")
             {
                 IMethodSymbol MethodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
                 if (MethodSymbol.ContainingType?.Name == "DataSchema")
                 {
-                    // * identity datatype is only integer 
                     LambdaExpressionSyntax CallbackArgument = (LambdaExpressionSyntax)InvocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
                     if (CallbackArgument != null)
                     {
+                        #region Identity Type Only Integer
                         IEnumerable<InvocationExpressionSyntax> PKCallList = CallbackArgument.DescendantNodes().OfType<MemberAccessExpressionSyntax>()
                             .Where(MemberAccess =>
                                     MemberAccess.Name.ToString() == "Identity" &&
@@ -92,7 +85,8 @@ namespace Ember.CodeAnalysis
                         {
                             Context.ReportDiagnostic(Diagnostic.Create(Rule, PKCall.GetLocation(), "Identity column must be of data type Integer Decimal or Numeric"));
                         }
-                        // * foreign key must include all related function
+                        #endregion
+                        #region ForeignKeys Must Be In Order
                         var ChainedMethodsList = CallbackArgument.Body.DescendantNodes().OfType<InvocationExpressionSyntax>();
                         foreach ((InvocationExpressionSyntax ChainedMethods, Int32 Index) in ChainedMethodsList.Select((methodCall, Index) => (methodCall, Index)))
                         {
@@ -107,11 +101,14 @@ namespace Ember.CodeAnalysis
                                 }
                             }
                         }
-
+                        #endregion
+                        #region New Stuff
+                        //TODO: List other similar cases
+                        #endregion
                     }
                 }
             }
-            //TODO: List other similar cases.
+            #endregion
         }
     }
     #region Reference Code
