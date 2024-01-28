@@ -11,6 +11,13 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 
+/*general for TODO:
+ * table only one primary key (both create and alter)
+ * function name should never repeat in same line
+ * in Create - line should always start with dataType
+ * in Alter - line should always start with AlterColumn or CreateColumn
+ */
+
 namespace Ember.CodeAnalysis
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
