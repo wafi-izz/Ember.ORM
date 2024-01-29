@@ -32,23 +32,23 @@ namespace Ember.CodeAnalysis
         }
         private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
         {
-            InvocationExpressionSyntax invocationExpression = (InvocationExpressionSyntax)Context.Node;
-            MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)invocationExpression.Expression;
+            InvocationExpressionSyntax InvocationExpression = (InvocationExpressionSyntax)Context.Node;
+            MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)InvocationExpression.Expression;
             #region Table Create Function
             if (MethodName.Name.Identifier.Text == "Create")
             {
-                IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
-                if (methodSymbol.ContainingType?.Name == "DataSchema")
+                IMethodSymbol MethodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
+                if (MethodSymbol.ContainingType?.Name == "DataSchema")
                 {
-                    LambdaExpressionSyntax callbackArgument = (LambdaExpressionSyntax)invocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
-                    if (callbackArgument != null)
+                    LambdaExpressionSyntax CallbackArgument = (LambdaExpressionSyntax)InvocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
+                    if (CallbackArgument != null)
                     {
                         #region Alter specific Functions
-                        List<InvocationExpressionSyntax> CreateColumnCalls = callbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
-                            .Where(invocationSyntax => new String[] { "CreateColumn", "AlterColumn" }.Contains((invocationSyntax.Expression as MemberAccessExpressionSyntax).Name.Identifier.Text)).ToList();
-                        foreach (InvocationExpressionSyntax createColumnCall in CreateColumnCalls)
+                        List<InvocationExpressionSyntax> CreateColumnCalls = CallbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                            .Where(InvocationSyntax => new String[] { "CreateColumn", "AlterColumn" }.Contains((InvocationSyntax.Expression as MemberAccessExpressionSyntax).Name.Identifier.Text)).ToList();
+                        foreach (InvocationExpressionSyntax CreateColumnCall in CreateColumnCalls)
                         {
-                            Context.ReportDiagnostic(Diagnostic.Create(Rule, createColumnCall.GetLocation(), "this method can only be used inside an 'Alter' function"));
+                            Context.ReportDiagnostic(Diagnostic.Create(Rule, CreateColumnCall.GetLocation(), "this method can only be used inside an 'Alter' function"));
                         }
                         #endregion
                     }
@@ -116,6 +116,54 @@ namespace Ember.CodeAnalysis
                 }
             }
             #endregion
+        }
+    }
+    [DiagnosticAnalyzer(LanguageNames.CSharp)]
+    public class MethodDuplications : DiagnosticAnalyzer
+    {
+        public const string DiagnosticId = "MT003";
+        internal static readonly DiagnosticDescriptor Rule = new DiagnosticDescriptor(DiagnosticId, "Function Is Only Allowed Once", "'{0}' ", "Usage", DiagnosticSeverity.Error, isEnabledByDefault: true);
+        public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics { get { return ImmutableArray.Create(Rule); } }
+        public override void Initialize(AnalysisContext Context)
+        {
+            Context.RegisterSyntaxNodeAction(AnalyzeSyntaxNode, SyntaxKind.InvocationExpression);
+        }
+        private static void AnalyzeSyntaxNode(SyntaxNodeAnalysisContext Context)
+        {
+            InvocationExpressionSyntax invocationExpression = (InvocationExpressionSyntax)Context.Node;
+            MemberAccessExpressionSyntax MethodName = (MemberAccessExpressionSyntax)invocationExpression.Expression;
+            #region Table Create Function
+            if (new String[] { "Create", "Alter" }.Contains(MethodName.Name.Identifier.Text))
+            {
+                IMethodSymbol methodSymbol = (IMethodSymbol)Context.SemanticModel.GetSymbolInfo(MethodName).Symbol;
+                if (methodSymbol.ContainingType?.Name == "DataSchema")
+                {
+                    LambdaExpressionSyntax CallbackArgument = null;
+                    if (MethodName.Name.Identifier.Text == "Create")
+                        CallbackArgument = (LambdaExpressionSyntax)invocationExpression.ArgumentList.Arguments.ElementAtOrDefault(1)?.Expression;
+                    else if (MethodName.Name.Identifier.Text == "Alter")
+                        CallbackArgument = (LambdaExpressionSyntax)invocationExpression.ArgumentList.Arguments.ElementAtOrDefault(2)?.Expression;
+                    if (CallbackArgument != null)
+                    {
+                        #region Duplicated Functions
+                        var ChainedMethodsList = CallbackArgument.Body.DescendantNodes().OfType<InvocationExpressionSyntax>();
+                        Boolean FirstPrimaryKey = true;
+                        foreach ((InvocationExpressionSyntax ChainedMethods, Int32 Index) in ChainedMethodsList.Select((methodCall, Index) => (methodCall, Index)))
+                        {
+                            if (ChainedMethods.Parent is ExpressionStatementSyntax)
+                            {
+                                if (!FirstPrimaryKey && ChainedMethods.ToString().Contains(".PrimaryKey"))
+                                    Context.ReportDiagnostic(Diagnostic.Create(Rule, ChainedMethods.GetLocation(), "Table Must Contain Only One PrimaryKey Column."));
+                                if (FirstPrimaryKey && ChainedMethods.ToString().Contains(".PrimaryKey"))
+                                    FirstPrimaryKey = false;
+                            }
+                        }
+                        #endregion
+                    }
+                }
+            }
+            #endregion
+            //TODO: List other similar cases.
         }
     }
     #region Reference Code
