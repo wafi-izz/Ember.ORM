@@ -12,8 +12,7 @@ using System.Reflection;
 using System.Threading;
 
 /*general for TODO:
- * in Create - line should always start with dataType
- * in Alter - line should always start with AlterColumn or CreateColumn
+ * 
  */
 
 namespace Ember.CodeAnalysis
@@ -128,15 +127,24 @@ namespace Ember.CodeAnalysis
                                 }
                             }
                             #endregion
+                            #region create must always start with datatype
+                            List<String> SchemaDataTypeList = new List<String>() { "Integer", "String", "Varchar", "Boolean" };
+                            List<InvocationExpressionSyntax> CreateChainedMethodsList = CallbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                                .Where(InvocationSyntax => InvocationSyntax.Parent is ExpressionStatementSyntax && !SchemaDataTypeList.Any(x => InvocationSyntax.ToString().Contains(x))).ToList();
+                            foreach (InvocationExpressionSyntax CreateChainedMethods in CreateChainedMethodsList)
+                            {
+                                Context.ReportDiagnostic(Diagnostic.Create(Rule, CreateChainedMethods.GetLocation(), $"Table Creation Must Start With a DataType ({String.Join(" - ", SchemaDataTypeList)}) "));
+                            }
+                            #endregion
                         }
                         if (MethodName.Name.Identifier.Text == "Alter")
                         {
                             #region Alter Standard Start Function
-                            List<InvocationExpressionSyntax> CreateColumnCalls = CallbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
+                            List<InvocationExpressionSyntax> AlterColumnCalls = CallbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
                                 .Where(InvocationSyntax => InvocationSyntax.Parent is ExpressionStatementSyntax && !(InvocationSyntax.ToString().Contains("CreateColumn") || InvocationSyntax.ToString().Contains("AlterColumn"))).ToList();
-                            foreach (InvocationExpressionSyntax CreateColumnCall in CreateColumnCalls)
+                            foreach (InvocationExpressionSyntax AlterColumnCall in AlterColumnCalls)
                             {
-                                Context.ReportDiagnostic(Diagnostic.Create(Rule, CreateColumnCall.GetLocation(), "Table Alteration Must Start With either 'AlterColumn' or 'CreateColumn'"));
+                                Context.ReportDiagnostic(Diagnostic.Create(Rule, AlterColumnCall.GetLocation(), "Table Alteration Must Start With either 'AlterColumn' or 'CreateColumn'"));
                             }
                             #endregion
                         }

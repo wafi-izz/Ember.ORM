@@ -25,7 +25,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.String("ShortName_AR", 500);
             Table.Boolean("PermissionAble").Default(false).Nullable();
             Table.Boolean("Keyable").Default(false).Nullable();
-            Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
+            Table.Max("ObjectCustomPropertyable").Default(false).Nullable();
         });
         GlobalDataSchema.MSSQLDB.Create(TableName, Table =>
         {
