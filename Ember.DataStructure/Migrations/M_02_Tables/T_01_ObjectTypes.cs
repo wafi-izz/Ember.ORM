@@ -6,6 +6,15 @@ using Ember.DataStructure.Database;
 
 namespace Ember.DataStructure.Migrations.M_02_Tables;
 
+/* TODO:
+ * add the reset of table columns functions
+ * add the reset of variations
+ * Add the variations to the analyzer
+ * ****alter
+ * make the add remove foreign key
+ * make the add remove constraints
+ */
+
 public class T_01_ObjectTypes : Table, IMigratablesDictionary
 {
     public String TableName { get; set; }

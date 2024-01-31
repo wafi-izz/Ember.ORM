@@ -11,10 +11,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading;
 
-/*general for TODO:
- * 
- */
-
 namespace Ember.CodeAnalysis
 {
     [DiagnosticAnalyzer(LanguageNames.CSharp)]
