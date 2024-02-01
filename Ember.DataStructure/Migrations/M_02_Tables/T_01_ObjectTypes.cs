@@ -7,12 +7,15 @@ using Ember.DataStructure.Database;
 namespace Ember.DataStructure.Migrations.M_02_Tables;
 
 /* TODO:
- * add the reset of table columns functions
- * add the reset of variations
- * Add the variations to the analyzer
- * ****alter
- * make the add remove foreign key
- * make the add remove constraints
+ * **** create
+    * add the reset of table columns functions
+    * Add the functions to the analyzer list
+ * **** alter
+    * make the add remove foreign key
+    * make the add remove constraints
+    * ... and what else
+ * **** create
+    * last of all - add the reset of variations
  */
 
 public class T_01_ObjectTypes : Table, IMigratablesDictionary
@@ -48,7 +51,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
         });
-        GlobalDataSchema.MSSQLDB.Alter(TableName,"NewObjectType", Table =>
+        GlobalDataSchema.MSSQLDB.Alter(TableName, "NewObjectType", Table =>
         {
             Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
             Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentence)");
@@ -57,10 +60,10 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
             Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
         });
-        GlobalDataSchema.PostgreDB.Alter(TableName,"NewObjectType", Table =>
+        GlobalDataSchema.PostgreDB.Alter(TableName, "NewObjectType", Table =>
         {
             Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
-            Table.AlterColumn("ObjectTypeID").String(500,StringType.NVARCHAR).Nullable();
+            Table.AlterColumn("ObjectTypeID").String(500, StringType.NVARCHAR).Nullable();
             Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentence)");
             Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
             Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");

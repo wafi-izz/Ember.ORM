@@ -76,7 +76,7 @@ public class TableBluePrint : BluePrint
         ColumnInit();
         Column.ColumnName = ColumnName;
         Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.String.ToString());
-        Column.ColumnDataType.Add("DataTypeSQLName", StringType.ToString().ToLower());
+        Column.ColumnDataType.Add("DataTypeSQLName", StringType.ToString());
         Column.ColumnDataType.Add("Length", Length);
         return this;
     }
@@ -300,6 +300,16 @@ public enum ColumnTypeEnum
     Numeric,
     String,
     Boolean,
+    Date,
+    Time,
+    DateTime,
+    Xml,
+    Timestamp,
+    Binary,
+    Geometry,
+    File,
+    Image,
+    //i think these are what I'll support for now
 }
 // aaaah ... should all the supported types be here or over at the transcriber class
 public enum StringType
