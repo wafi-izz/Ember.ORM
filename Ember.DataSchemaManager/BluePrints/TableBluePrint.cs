@@ -13,6 +13,7 @@ namespace Ember.DataSchemaManager.BluePrints;
  * **** create
     * add the reset of table columns functions
     * Add the functions to the analyzer list
+    * make triggers or something for PostgreSQL and/or the other providers if they need so, that comes automatically with timestamp columns
  * **** alter
     * make the add remove foreign key
     * make the add remove constraints
@@ -139,6 +140,14 @@ public class TableBluePrint : BluePrint
         Column.ColumnName = ColumnName;
         Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.DateTime.ToString());
         Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.DateTime.ToString());
+        return this;
+    }
+    public TableBluePrint Timestamp(String ColumnName) //TODO: see if SQL providers specify a format.
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Timestamp.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Timestamp.ToString());
         return this;
     }
     #endregion
