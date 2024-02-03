@@ -79,6 +79,10 @@ public class TableTranscriber
             {
                 return "Boolean";
             }
+            else if (ColumnDataType == ColumnTypeEnum.DateTime.ToString())
+            {
+                return "TimeStamp";
+            }
             else return $"{SpecifiColumnDataType}{Length}";
         }
         return null;

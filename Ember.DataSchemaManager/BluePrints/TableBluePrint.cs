@@ -9,6 +9,18 @@ using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 
 namespace Ember.DataSchemaManager.BluePrints;
 
+/* TODO:
+ * **** create
+    * add the reset of table columns functions
+    * Add the functions to the analyzer list
+ * **** alter
+    * make the add remove foreign key
+    * make the add remove constraints
+    * ... and what else
+ * **** create
+    * last of all - add the reset of variations
+ */
+
 
 public class TableBluePrint : BluePrint
 {
@@ -59,7 +71,7 @@ public class TableBluePrint : BluePrint
     public void RowStatement(String Statement)
     {
         ColumnInit();
-        Column.Statemant = Statement;
+        Column.Statement = Statement;
     }
     #region Create
     #region First Phase
@@ -105,6 +117,30 @@ public class TableBluePrint : BluePrint
         Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Boolean.ToString()); // this is an specific sql provider datatype shouldn't be defined here.
         return this;
     }
+    public TableBluePrint Date(String ColumnName) //TODO: see if SQL providers specify a format.
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Date.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Date.ToString());
+        return this;
+    }
+    public TableBluePrint Time(String ColumnName) //TODO: see if SQL providers specify a format.
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Time.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Time.ToString());
+        return this;
+    }
+    public TableBluePrint DateTime(String ColumnName) //TODO: see if SQL providers specify a format.
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.DateTime.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.DateTime.ToString());
+        return this;
+    }
     #endregion
     #region Foreigns
     public TableBluePrint ForeignKey()
@@ -145,11 +181,11 @@ public class TableBluePrint : BluePrint
     public TableBluePrint PrimaryKey()
     {
         if (ColumnList.Count >= 1 && ColumnList.FirstOrDefault(x => x.IsPrimaryKey && x.ColumnName != Column.ColumnName) != null)
-            throw new Exception($"the table '{TableName}' already a Primary Key assigned other than the Column '{Column.ColumnName}'");
+            throw new ArgumentException($"the table '{TableName}' already a Primary Key assigned other than the Column '{Column.ColumnName}'");
         if (!Column.IsForeignKey)
             Column.IsPrimaryKey = true;
         else
-            throw new Exception($"the column '{Column.ColumnName}' is already assigned as a Foreign Key");
+            throw new ArgumentException($"the column '{Column.ColumnName}' is already assigned as a Foreign Key");
         return this;
     }
     public TableBluePrint Identity(Int32 IncrementValue = 1, Int32 StartValue = 1)
@@ -163,7 +199,7 @@ public class TableBluePrint : BluePrint
                 IdentitiedColumnsSentance += item + " - ";
             }
             IdentitiedColumnsSentance += $"{Column.ColumnName}";
-            throw new Exception($"Multiple identity columns specified for table '{TableName}' columns '{IdentitiedColumnsSentance}'. Only one identity column per table is allowed");
+            throw new ArgumentException($"Multiple identity columns specified for table '{TableName}' columns '{IdentitiedColumnsSentance}'. Only one identity column per table is allowed");
         }
         Column.IsIdentity = true;
         Column.Identity.Add(nameof(IncrementValue), IncrementValue);
@@ -270,14 +306,14 @@ public class TableBluePrint : BluePrint
 
 public class ColumnBluePrint
 {
-    public String Statemant { get; set; }
+    public String Statement { get; set; }
     public String ColumnName { get; set; }
-    public JsonObject ColumnDataType { get; set; }
+    public JsonObject ColumnDataType { get; } //NOTE: there an element name "DataTypeSQLName" it is used to distinguish between the different naming across the providers.
     public Boolean IsPrimaryKey { get; set; }
     public Boolean IsIdentity { get; set; }
     public Boolean IsForeignKey { get; set; }
-    public JsonObject ForeignKeyArguments { get; set; }
-    public JsonObject Identity { get; set; }
+    public JsonObject ForeignKeyArguments { get; }
+    public JsonObject Identity { get; }
     public dynamic Default { get; set; }
     public Boolean Nullable { get; set; }
     public decimal MinValue { get; set; }
@@ -303,8 +339,8 @@ public enum ColumnTypeEnum
     Date,
     Time,
     DateTime,
-    Xml,
     Timestamp,
+    Xml,
     Binary,
     Geometry,
     File,

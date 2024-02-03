@@ -5,19 +5,6 @@ using Ember.DataSchemaManager.BluePrints;
 using Ember.DataStructure.Database;
 
 namespace Ember.DataStructure.Migrations.M_02_Tables;
-
-/* TODO:
- * **** create
-    * add the reset of table columns functions
-    * Add the functions to the analyzer list
- * **** alter
-    * make the add remove foreign key
-    * make the add remove constraints
-    * ... and what else
- * **** create
-    * last of all - add the reset of variations
- */
-
 public class T_01_ObjectTypes : Table, IMigratablesDictionary
 {
     public String TableName { get; set; }
@@ -38,6 +25,9 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("PermissionAble").Default(false).Nullable();
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
+            Table.Date("ObjectDate").Default("10/10/1995").Nullable();
+            Table.Time("ObjectTime").Default("10:00:00").Nullable();
+            Table.DateTime("ObjectDateTime").Default("10/10/1995 10:00:00").Nullable();
         });
         GlobalDataSchema.MSSQLDB.Create(TableName, Table =>
         {
@@ -50,6 +40,9 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Boolean("PermissionAble").Default(false).Nullable();
             Table.Boolean("Keyable").Default(false).Nullable();
             Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
+            Table.Date("ObjectDate").Default("10/10/1995").Nullable();
+            Table.Time("ObjectTime").Default("10:00:00").Nullable();
+            Table.DateTime("ObjectDateTime").Default("10/10/1995 10:00:00").Nullable();
         });
         GlobalDataSchema.MSSQLDB.Alter(TableName, "NewObjectType", Table =>
         {

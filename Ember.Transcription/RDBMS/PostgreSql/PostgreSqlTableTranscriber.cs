@@ -38,8 +38,8 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
         foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
         {
             Transcript += "\t";
-            if (Column.Statemant != null)
-                Transcript += Column.Statemant;
+            if (Column.Statement != null)
+                Transcript += Column.Statement;
             else
             {
                 Transcript += ColumnHead(Column);
