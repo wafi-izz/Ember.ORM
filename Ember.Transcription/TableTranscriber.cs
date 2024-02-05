@@ -56,7 +56,7 @@ public class TableTranscriber
     }
     #endregion
 
-    public String? TranscribeDataType(String ColumnDataType, String SpecifiColumnDataType, String Length)
+    public String? TranscribeDataType(String ColumnDataType, String SpecificColumnDataType, String Length)
     {
         String ClassName = this.GetType().Name;
         if (ClassName == nameof(SqlServerTableTranscriber))
@@ -65,15 +65,19 @@ public class TableTranscriber
             {
                 return $"BIT{Length}";
             }
-            else return $"{SpecifiColumnDataType}{Length}";
+            else if (new String[] { ColumnTypeEnum.File.ToString() }.Contains(ColumnDataType))
+            {
+                return "VarBinary";
+            }
+            else return $"{SpecificColumnDataType}{Length}";
         }
         if (ClassName == nameof(PostgreSqlTableTranscriber))
         {
             if (ColumnDataType == ColumnTypeEnum.String.ToString())
             {
-                if (new String[] { StringType.VARCHAR.ToString(), StringType.CHAR.ToString(), StringType.TEXT.ToString(), StringType.NTEXT.ToString() }.Contains(SpecifiColumnDataType.ToUpper())) return $"{SpecifiColumnDataType}{Length}";
+                if (new String[] { StringType.VARCHAR.ToString(), StringType.CHAR.ToString(), StringType.TEXT.ToString(), StringType.NTEXT.ToString() }.Contains(SpecificColumnDataType.ToUpper())) return $"{SpecificColumnDataType}{Length}";
                 //TODO: find a wat to collation Nvarchar for postgre
-                if (new String[] { StringType.NVARCHAR.ToString(), StringType.NCHAR.ToString() }.Contains(SpecifiColumnDataType.ToUpper())) return $"{SpecifiColumnDataType.Substring(1)}{Length} /*A NATIONALIZED DATATYPE IS COMMING*/";
+                if (new String[] { StringType.NVARCHAR.ToString(), StringType.NCHAR.ToString() }.Contains(SpecificColumnDataType.ToUpper())) return $"{SpecificColumnDataType.Substring(1)}{Length} /*A NATIONALIZED DATATYPE IS COMMING*/";
             }
             else if (ColumnDataType == ColumnTypeEnum.Boolean.ToString())
             {
@@ -83,7 +87,11 @@ public class TableTranscriber
             {
                 return "TimeStamp";
             }
-            else return $"{SpecifiColumnDataType}{Length}";
+            else if ( new String[] { ColumnTypeEnum.Binary.ToString() , ColumnTypeEnum.VarBinary.ToString() , ColumnTypeEnum.File.ToString() ,ColumnTypeEnum.Image.ToString() }.Contains(ColumnDataType))
+            {
+                return "ByteA";
+            }
+            else return $"{SpecificColumnDataType}{Length}";
         }
         return null;
     }

@@ -124,7 +124,7 @@ namespace Ember.CodeAnalysis
                             }
                             #endregion
                             #region create must always start with datatype
-                            List<String> SchemaDataTypeList = new List<String>() { "Integer", "String", "Varchar", "Boolean", "Date", "Time", "DateTime", "Timestamp", "Xml", "Binary", "Geometry", "File", "Image" };
+                            List<String> SchemaDataTypeList = new List<String>() { "Integer", "String", "Varchar", "Boolean", "Date", "Time", "DateTime", "Timestamp", "Xml", "Binary", "VarBinary", "Geometry", "File", "Image" };
                             List<InvocationExpressionSyntax> CreateChainedMethodsList = CallbackArgument.DescendantNodes().OfType<InvocationExpressionSyntax>()
                                 .Where(InvocationSyntax => InvocationSyntax.Parent is ExpressionStatementSyntax && !SchemaDataTypeList.Any(x => InvocationSyntax.ToString().Contains(x))).ToList();
                             foreach (InvocationExpressionSyntax CreateChainedMethods in CreateChainedMethodsList)

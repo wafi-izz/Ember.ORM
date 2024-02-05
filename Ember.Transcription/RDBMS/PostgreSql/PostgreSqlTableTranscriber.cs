@@ -12,6 +12,10 @@ using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 
 namespace Ember.Transcription.RDBMS.PostgreSql;
 
+/*TODO: 
+ * column name must be enclosed in quotes
+ */
+
 internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
 {
     public String Transcript { get; set; }

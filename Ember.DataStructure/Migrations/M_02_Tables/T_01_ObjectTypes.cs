@@ -29,6 +29,12 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Time("ObjectTime").Default("10:00:00").Nullable();
             Table.DateTime("ObjectDateTime").Default("10/10/1995 10:00:00").Nullable();
             Table.Timestamp("ObjectDateTimestamp").Nullable();
+            Table.Xml("ObjectDateXml").Nullable();
+            Table.Binary("ObjectDateBinary").Nullable();
+            Table.VarBinary("ObjectDateVarBinary").Nullable();
+            Table.Geometry("ObjectDateGeometry").Nullable();
+            Table.File("ObjectDateFile").Nullable();
+            Table.Image("ObjectDateImage").Nullable();
         });
         GlobalDataSchema.MSSQLDB.Create(TableName, Table =>
         {
@@ -45,6 +51,12 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.Time("ObjectTime").Default("10:00:00").Nullable();
             Table.DateTime("ObjectDateTime").Default("10/10/1995 10:00:00").Nullable();
             Table.Timestamp("ObjectDateTimestamp").Nullable();
+            Table.Xml("ObjectDateXml").Nullable();
+            Table.Binary("ObjectDateBinary").Nullable();
+            Table.VarBinary("ObjectDateVarBinary").Nullable();
+            Table.Geometry("ObjectDateGeometry").Nullable();
+            Table.File("ObjectDateFile").Nullable();
+            Table.Image("ObjectDateImage").Nullable();
         });
         GlobalDataSchema.MSSQLDB.Alter(TableName, "NewObjectType", Table =>
         {

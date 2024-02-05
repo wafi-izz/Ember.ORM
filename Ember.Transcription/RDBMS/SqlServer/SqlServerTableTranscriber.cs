@@ -46,7 +46,6 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
                 Transcript += NullabilityState(Column);
             }
             Transcript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
-        Console.WriteLine("sda");
         }
         Transcript += $");\n\n ";
     }

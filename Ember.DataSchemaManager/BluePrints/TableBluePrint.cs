@@ -11,8 +11,6 @@ namespace Ember.DataSchemaManager.BluePrints;
 
 /* TODO:
  * **** create
-    * add the reset of table columns functions
-    * Add the functions to the analyzer list
     * make triggers or something for PostgreSQL and/or the other providers if they need so, that comes automatically with timestamp columns
  * **** alter
     * make the add remove foreign key
@@ -148,6 +146,54 @@ public class TableBluePrint : BluePrint
         Column.ColumnName = ColumnName;
         Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Timestamp.ToString());
         Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Timestamp.ToString());
+        return this;
+    }
+    public TableBluePrint Xml(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Xml.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Xml.ToString());
+        return this;
+    }
+    public TableBluePrint Binary(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Binary.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Binary.ToString());
+        return this;
+    }
+    public TableBluePrint VarBinary(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.VarBinary.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.VarBinary.ToString());
+        return this;
+    }
+    public TableBluePrint Geometry(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Geometry.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Geometry.ToString());
+        return this;
+    }
+    public TableBluePrint File(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.File.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.File.ToString());
+        return this;
+    }
+    public TableBluePrint Image(String ColumnName)
+    {
+        ColumnInit();
+        Column.ColumnName = ColumnName;
+        Column.ColumnDataType.Add("DataTypeName", ColumnTypeEnum.Image.ToString());
+        Column.ColumnDataType.Add("DataTypeSQLName", ColumnTypeEnum.Image.ToString());
         return this;
     }
     #endregion
@@ -351,6 +397,7 @@ public enum ColumnTypeEnum
     Timestamp,
     Xml,
     Binary,
+    VarBinary,
     Geometry,
     File,
     Image,
@@ -366,3 +413,7 @@ public enum StringType
     VARCHAR,
     NVARCHAR,
 }
+//TODO: integer and its types enum
+public enum IntegerType { }
+//TODO: Numeric and its types enum
+public enum NumericType { }
