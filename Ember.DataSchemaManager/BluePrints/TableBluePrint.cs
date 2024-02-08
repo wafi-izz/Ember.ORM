@@ -10,14 +10,17 @@ using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 namespace Ember.DataSchemaManager.BluePrints;
 
 /* TODO:
- * **** create
-    * make triggers or something for PostgreSQL and/or the other providers if they need so, that comes automatically with timestamp columns
  * **** alter
     * make the add remove foreign key
     * make the add remove constraints
     * ... and what else
  * **** create
+    * make triggers or something for PostgreSQL and/or the other providers if they need so, that comes automatically with timestamp columns
     * last of all - add the reset of variations
+ */
+
+/* TODO:
+ * setting file for each database for conventions and such
  */
 
 

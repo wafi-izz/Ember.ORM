@@ -1,12 +1,12 @@
 ﻿using Ember.DataSchemaManager.BluePrints;
 using Ember.DataSchemaManager.DataSchemas;
 using Ember.Transcription.TranscriptionInterfaces;
+using System.Text.Json.Nodes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
 using System.Text;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
 using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 
@@ -14,6 +14,7 @@ namespace Ember.Transcription.RDBMS.PostgreSql;
 
 /*TODO: 
  * column name must be enclosed in quotes
+ * find a way to make column be as the user want to enforce postgre to use it
  */
 
 internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
@@ -39,6 +40,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     public void Create(TableBluePrint TableBluePrint)
     {
         Transcript += $"CREATE TABLE \"{TableBluePrint.TableName}\"(\n";
+        List<ColumnBluePrint> TriggerRequiredColumns = new List<ColumnBluePrint>();
         foreach ((ColumnBluePrint Column, Int32 Index) in TableBluePrint.ColumnList.Select((Column, Index) => (Column, Index + 1)))
         {
             Transcript += "\t";
@@ -48,20 +50,39 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
             {
                 Transcript += ColumnHead(Column);
                 Transcript += PrimaryKey(Column);
-                Transcript += IDENTITY(TableBluePrint.TableName,Column);
+                Transcript += IDENTITY(TableBluePrint.TableName, Column);
                 Transcript += ForeignKeySection(TableBluePrint.TableName, Column);
                 Transcript += DefaultValue(Column);
                 Transcript += NullabilityState(Column);
             }
             Transcript += TableBluePrint.ColumnList.Count > Index ? $",\n" : "\n";
+            if (Column.ColumnDataType["DataTypeName"]!.ToString() == ColumnTypeEnum.Timestamp.ToString())
+                TriggerRequiredColumns.Add(Column);
         }
         Transcript += $");\n\n ";
+        // loop again in search for timestamp columns
+        // add trigger
+        // live happily ever after
+        foreach (ColumnBluePrint Column in TriggerRequiredColumns)
+        {
+            Transcript += $"\n" +
+                $"Create OR Replace Function \"{TableBluePrint.TableName}_UpdateTimestampFunction\"() Returns Trigger As $$" + "\n" +
+                $"Begin " + "\n" +
+                $"New.{Column.ColumnName} = Now(); " + "\n" +
+                $"Return New; " + "\n" +
+                $"End " + "\n" +
+                $"$$ Language plpgsql; " + "\n" +
+                $"Create Trigger \"{TableBluePrint.TableName}_UpdateTimestampFunction\" " + "\n" +
+                $"Before Insert Or Update On \"{TableBluePrint.TableName}\" " + "\n" +
+                $"For Each Row " + "\n" +
+                $"Execute Function \"{TableBluePrint.TableName}_UpdateTimestampFunction\"();" + "\n\n";
+        }
     }
     public String ColumnHead(ColumnBluePrint Column)
     {
         String Length = Column.ColumnDataType["Length"] != null ? Column.ColumnDataType["Length"]!.ToString() : "";
         String DataTypeParameter = Length != "" && Length!.ToLower() != "max" ? $"({Length})" : "";
-        return $"{Column.ColumnName} {TranscribeDataType(Column.ColumnDataType["DataTypeName"]!.ToString(),Column.ColumnDataType["DataTypeSQLName"]!.ToString(), DataTypeParameter)} ";
+        return $"{Column.ColumnName} {TranscribeDataType(Column.ColumnDataType["DataTypeName"]!.ToString(), Column.ColumnDataType["DataTypeSQLName"]!.ToString(), DataTypeParameter)} ";
     }
     public String IDENTITY(String TableName, ColumnBluePrint Column)
     {
@@ -133,7 +154,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     public override String DropTableQuery(TableBluePrint TableBluePrint)
     {
         //TODO: must specify witch schema to drop to or create in to.
-        return $"DROP TABLE IF EXISTS \"{TableBluePrint.ObjectName}\";\n\n"; 
+        return $"DROP TABLE IF EXISTS \"{TableBluePrint.ObjectName}\";\n\n";
     }
     #endregion
 }
