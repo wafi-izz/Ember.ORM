@@ -14,31 +14,9 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
     }
     public void Up()
     {
-        GlobalDataSchema.PostgreDB.Create(TableName, Table =>
-        {
-            //Table.Integer("ObjectTypeID").PrimaryKey().Identity().Min(1).Max(100);
-            //Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
-            //Table.String("ObjectTypeName", 500).Default("Some Name Default");
-            //Table.String("ObjectTypeName_AR", 500).Nullable();
-            //Table.Varchar("ShortName", "max");
-            Table.String("ShortName_AR", 500);
-            //Table.Boolean("PermissionAble").Default(false).Nullable();
-            //Table.Boolean("Keyable").Default(false).Nullable();
-            //Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
-            //Table.Date("ObjectDate").Default("10/10/1995").Nullable();
-            //Table.Time("ObjectTime").Default("10:00:00").Nullable();
-            //Table.DateTime("ObjectDateTime").Default("10/10/1995 10:00:00").Nullable();
-            Table.Timestamp("ObjectDateTimestamp").Nullable();
-            //Table.Xml("ObjectDateXml").Nullable();
-            //Table.Binary("ObjectDateBinary").Nullable();
-            //Table.VarBinary("ObjectDateVarBinary").Nullable();
-            ////Table.Geometry("ObjectDateGeometry").Nullable();
-            //Table.File("ObjectDateFile").Nullable();
-            //Table.Image("ObjectDateImage").Nullable();
-        });
         GlobalDataSchema.MSSQLDB.Create(TableName, Table =>
         {
-            Table.Integer("ObjectTypeID").PrimaryKey().Identity();
+            Table.Integer("ObjectTypeID").PrimaryKey().Identity().Min(1).Max(100);
             Table.Integer("DD").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
             Table.String("ObjectTypeName", 500).Default("Some Name Default");
             Table.String("ObjectTypeName_AR", 500).Nullable();
@@ -58,25 +36,50 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
             Table.File("ObjectDateFile").Nullable();
             Table.Image("ObjectDateImage").Nullable();
         });
+        GlobalDataSchema.PostgreDB.Create(TableName, Table =>
+        {
+            Table.Integer("ObjectTypeID").PrimaryKey().Identity();
+            Table.Integer("ObjectTypeParentID").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.String("ObjectTypeName", 500).Default("Some Name Default");
+            Table.String("ObjectTypeName_AR", 500).Nullable();
+            Table.Varchar("ShortName", "max");
+            Table.String("ShortName_AR", 500);
+            Table.Boolean("PermissionAble").Default(false).Nullable();
+            Table.Boolean("Keyable").Default(false).Nullable();
+            Table.Boolean("ObjectCustomPropertyable").Default(false).Nullable();
+            Table.Date("ObjectDate").Default("10/10/1995").Nullable();
+            Table.Time("ObjectTime").Default("10:00:00").Nullable();
+            Table.DateTime("ObjectDateTime").Default("10/10/1995 10:00:00").Nullable();
+            Table.Timestamp("ObjectDateTimestamp").Nullable();
+            Table.Xml("ObjectDateXml").Nullable();
+            Table.Binary("ObjectDateBinary").Nullable();
+            Table.VarBinary("ObjectDateVarBinary").Nullable();
+            //Table.Geometry("ObjectDateGeometry").Nullable();
+            Table.File("ObjectDateFile").Nullable();
+            Table.Image("ObjectDateImage").Nullable();
+        });
         GlobalDataSchema.MSSQLDB.Alter(TableName, "NewObjectType", Table =>
         {
             Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
+            Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentence)");
+            Table.AlterColumn("ObjectTypeID").AddConstraint("Custom Name(if null a made up name will be used)").Min(1).Max(100);
+            Table.AlterColumn("ObjectTypeID").AddConstraint("Custom Name(if null a made up name will be used)").Min("ThatColumn").Max("ThatColumn");
+            Table.AlterColumn("ObjectTypeID").AddConstraint("Custom Name(if null a made up name will be used)").Min("getDate()").Max("GetDate()");
+            Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
+            Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
+            Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
+        });
+        GlobalDataSchema.PostgreDB.Alter(TableName, "NewObjectType", Table =>
+        {
+            Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
+            Table.AlterColumn("ObjectTypeID").String(500, StringType.NVARCHAR).Nullable();
             Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentence)");
             Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
             Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
             Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
             Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
         });
-        //GlobalDataSchema.PostgreDB.Alter(TableName, "NewObjectType", Table =>
-        //{
-        //    Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
-        //    Table.AlterColumn("ObjectTypeID").String(500, StringType.NVARCHAR).Nullable();
-        //    Table.AlterColumn("ObjectTypeID").AddConstraint("constrain stuff (full sentence)");
-        //    Table.AlterColumn("ObjectTypeID").RemoveConstraint("constrain name to remove");
-        //    Table.AlterColumn("ObjectTypeID").AddForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
-        //    Table.AlterColumn("ObjectTypeID").RemoveForeignKey();
-        //    Table.CreateColumn("NewColumn").Integer().Default(11).Nullable();
-        //});
     }
     public void Down()
     {

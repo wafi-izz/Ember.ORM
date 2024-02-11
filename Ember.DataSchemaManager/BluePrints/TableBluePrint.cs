@@ -10,19 +10,31 @@ using static Ember.DataSchemaManager.SharedFuncctions.Shared;
 namespace Ember.DataSchemaManager.BluePrints;
 
 /* TODO:
+ * add indexes
  * **** alter
-    * make the add remove foreign key
     * make the add remove constraints
+    * make the add remove foreign key
     * ... and what else
  * **** create
-    * make triggers or something for PostgreSQL and/or the other providers if they need so, that comes automatically with timestamp columns
     * last of all - add the reset of variations
  */
-
 /* TODO:
  * setting file for each database for conventions and such
+ * global variables for static values line integer size and it siblings
  */
 
+
+/*Thought Bubble
+ * common constraints
+    * less than number
+    * more than number
+    * less than other field
+    * more than other field
+    * less than sql value
+    * more than sql value
+    * is within a list (value in (1, 2, 3))
+    * had boolean (less than number or more than sql value)
+ */
 
 public class TableBluePrint : BluePrint
 {
@@ -248,6 +260,7 @@ public class TableBluePrint : BluePrint
     }
     public TableBluePrint Identity(Int32 IncrementValue = 1, Int32 StartValue = 1)
     {
+        /* this might not be needed */
         if (ColumnList.Count >= 1 && ColumnList.FirstOrDefault(x => x.IsIdentity && x.ColumnName != Column.ColumnName) != null)
         {
             List<String> IdentitiedColumns = ColumnList.Where(x => x.IsIdentity).Select(x => x.ColumnName).ToList<String>();
@@ -259,6 +272,7 @@ public class TableBluePrint : BluePrint
             IdentitiedColumnsSentance += $"{Column.ColumnName}";
             throw new ArgumentException($"Multiple identity columns specified for table '{TableName}' columns '{IdentitiedColumnsSentance}'. Only one identity column per table is allowed");
         }
+        /* --- */
         Column.IsIdentity = true;
         Column.Identity.Add(nameof(IncrementValue), IncrementValue);
         Column.Identity.Add(nameof(StartValue), StartValue);
@@ -358,6 +372,20 @@ public class TableBluePrint : BluePrint
         Column.Action = TableBluePrintAlterationAction.RemoveForeignKey;
         Column.RemovedForeignKey = true;
     }
+    public TableBluePrint LessThan(dynamic Value)
+    {
+        if (!IsNumeric(Value.ToString()))
+            throw new ArgumentException("Min Value Must Be a Number!");
+        Column.MinValue = Value;
+        return this;
+    }
+    public TableBluePrint MoreThan(dynamic Value)
+    {
+        if (!IsNumeric(Value.ToString()))
+            throw new ArgumentException("Max Value Must Be a Number!");
+        Column.MaxValue = Value;
+        return this;
+    }
     #endregion
     #endregion
 }
@@ -374,8 +402,8 @@ public class ColumnBluePrint
     public JsonObject Identity { get; }
     public dynamic Default { get; set; }
     public Boolean Nullable { get; set; }
-    public decimal MinValue { get; set; }
-    public decimal MaxValue { get; set; }
+    public decimal? MinValue { get; set; }
+    public decimal? MaxValue { get; set; }
     public String ColumnRename { get; set; }
     public String ConstrainQuery { get; set; }
     public String ConstrainName { get; set; }

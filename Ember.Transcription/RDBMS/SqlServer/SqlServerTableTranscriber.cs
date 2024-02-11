@@ -1,6 +1,7 @@
 ﻿using Ember.DataSchemaManager.BluePrints;
 using Ember.DataSchemaManager.DataSchemas;
 using Ember.Transcription.TranscriptionInterfaces;
+using Microsoft.Extensions.Logging.Abstractions;
 using System.Data.Common;
 using System.Runtime.InteropServices.Marshalling;
 using System.Security.Principal;
@@ -57,7 +58,15 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     }
     public String IDENTITY(String TableName, ColumnBluePrint Column)
     {
-        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) CONSTRAINT CHC_{TableName}_IDENTITY_RANGE CHECK ({Column.ColumnName} >= {Column.MaxValue} AND {Column.ColumnName} <= {Column.MaxValue})" : "";
+        String IdentityCheckConstraint = "";
+        if (Column.MinValue != null && Column.MaxValue != null)
+            IdentityCheckConstraint = $"CONSTRAINT CHC_{TableName}_IDENTITY_RANGE CHECK ({Column.ColumnName} >= {Column.MinValue} AND {Column.ColumnName} <= {Column.MaxValue})";
+        if (Column.MinValue != null && Column.MaxValue == null)
+            IdentityCheckConstraint = $"CONSTRAINT CHC_{TableName}_IDENTITY_RANGE CHECK ({Column.ColumnName} >= {Column.MinValue})";
+        if (Column.MinValue == null && Column.MaxValue != null)
+            IdentityCheckConstraint = $"CONSTRAINT CHC_{TableName}_IDENTITY_RANGE CHECK ({Column.ColumnName} <= {Column.MaxValue})";
+
+        return Column.IsIdentity ? $"IDENTITY({Column.Identity["IncrementValue"]},{Column.Identity["StartValue"]}) {IdentityCheckConstraint} " : "";
     }
     #endregion
     #region Alter
@@ -96,7 +105,7 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
         Int64 CurrentTick = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
         String ConstraintName = $"{Column.ColumnName}_{CurrentTick}_ConstraintName";
         String CheckString = $"{Column.ColumnName}_{CurrentTick}_CheckString";
-        String AlterScript = "\n" + 
+        String AlterScript = "\n" +
             $"DECLARE @{ConstraintName} Nvarchar(1000) = (SELECT cc.name AS CheckConstraintName FROM sys.check_constraints cc JOIN sys.columns c ON cc.parent_object_id = c.object_id AND cc.parent_column_id = c.column_id WHERE c.object_id = OBJECT_ID('{TableName}') AND c.name = '{Column.ColumnName}')\n" +
             $"DECLARE @{CheckString} Nvarchar(1000) = REPLACE((SELECT OBJECT_DEFINITION(object_id) AS ConstraintText FROM sys.check_constraints WHERE name = @{ConstraintName} AND parent_object_id = OBJECT_ID('{TableName}')),'{Column.ColumnName}','{Column.ColumnRename}')\n" +
             $"if not (@{ConstraintName} = '')\n" +
