@@ -88,7 +88,7 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     {
         return Column.IsIdentity ? $"GENERATED ALWAYS AS IDENTITY ( INCREMENT {Column.Identity["IncrementValue"]} START {Column.Identity["StartValue"]} MINVALUE {Column.MinValue} MAXVALUE {Column.MaxValue} CACHE 1 ) " : "";
     }
-    public override String ForeignKeySection(String TableName, ColumnBluePrint Column)
+    public override String ForeignKeySection(String TableName, ColumnBluePrint Column, Boolean AddForeKeyString = false)
     {
         if (!Column.IsForeignKey)
             return "";
@@ -108,7 +108,10 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
 
         JsonNode? CustomConstraintName = Column.ForeignKeyArguments["CustomConstraintName"];
         String ConstraintName = CustomConstraintName != null ? CustomConstraintName.GetValue<String>() : $"FK_{TableName}_{ForeignTable}_{ColumnName}_{ForeignTableColumnName} ";
-        return $"CONSTRAINT {ConstraintName} REFERENCES \"{ForeignTable}\" ({ForeignTableColumnName}) {OnUpdate} {OnDelete} ";
+        String ForeKeyStringPerRequest = "";
+        if (AddForeKeyString)
+            ForeKeyStringPerRequest = $"Foreign Key ({Column.ColumnName})";
+        return $"CONSTRAINT {ConstraintName} {ForeKeyStringPerRequest} REFERENCES \"{ForeignTable}\" ({ForeignTableColumnName}) {OnUpdate} {OnDelete} ";
     }
     #endregion
     #region Alter
@@ -119,10 +122,10 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
             if (Column.Action == TableBluePrintAlterationAction.CreateColumn) Transcript += CreateColumn(Column, TableBluePrint.TableName);
             if (Column.Action == TableBluePrintAlterationAction.AlterColumnName) Transcript += RenameColumn(Column, TableBluePrint.TableName);
             //if(Column.Action == TableBluePrintAlterationAction.AlterColumnType) Transcript += RenameColumn(Column, TableBluePrint.TableName);
-            //if(Column.Action == TableBluePrintAlterationAction.AddForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.AddForeignKey) Transcript += ForeignKey(Column, TableBluePrint.TableName);
             //if(Column.Action == TableBluePrintAlterationAction.RemoveForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
-            //if(Column.Action == TableBluePrintAlterationAction.AddConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
-            //if(Column.Action == TableBluePrintAlterationAction.RemoveConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.AddConstraint) Transcript += AddConstraint(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.RemoveConstraint) Transcript += RemoveConstraint(Column, TableBluePrint.TableName);
         }
     }
     public String CreateColumn(ColumnBluePrint Column, String TableName)
@@ -144,6 +147,24 @@ internal class PostgreSqlTableTranscriber : TableTranscriber, ITableTranscriber
     public String AlterColumnType(ColumnBluePrint Column, String TableName)
     {
         return "";
+    }
+    public String ForeignKey(ColumnBluePrint Column, String TableName)
+    {
+        return $"Alter Table \"{TableName}\"" + "\n\t" +
+            $"Add {ForeignKeySection(TableName, Column,true)};\n\n";
+    }
+    public String AddConstraint(ColumnBluePrint Column, String TableName)
+    {
+        Int64 CurrentTick = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        if (Column.ConstraintName == "")
+            Column.ConstraintName = TableName + "_" + CurrentTick;
+        return $"Alter Table \"{TableName}\"" + "\n\t" +
+            $"Add Constraint {Column.ConstraintName} Check ({Column.ConstraintQuery});\n\n";
+    }
+    public String RemoveConstraint(ColumnBluePrint Column, String TableName)
+    {
+        return $"Alter Table \"{TableName}\"" + "\n\t" +
+            $"Drop Constraint {Column.ConstraintName};\n\n";
     }
     #endregion
     #region Drop

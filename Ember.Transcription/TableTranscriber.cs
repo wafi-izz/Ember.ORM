@@ -19,7 +19,7 @@ public class TableTranscriber
     {
         return Column.IsPrimaryKey ? "PRIMARY KEY " : "";
     }
-    public virtual String ForeignKeySection(String TableName, ColumnBluePrint Column)
+    public virtual String ForeignKeySection(String TableName, ColumnBluePrint Column, Boolean AddForeKeyString = false)
     {
         if (!Column.IsForeignKey)
             return "";

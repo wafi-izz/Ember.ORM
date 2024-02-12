@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Org.BouncyCastle.Tls;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -55,6 +56,7 @@ public class TableBluePrint : BluePrint
     private ColumnBluePrint Column { get; set; }
     private Boolean ColumnInitRequired { get; set; }
     public List<ColumnBluePrint> ColumnList { get; set; }
+
     public TableBluePrint()
     {
         ColumnInitRequired = true;
@@ -349,16 +351,17 @@ public class TableBluePrint : BluePrint
         Boolean(Column.ColumnName);
         return this;
     }
-    public TableBluePrint AddConstraint(String ConstrainQuery)
+    public TableBluePrint AddConstraint(String ConstrainQuery, String ConstrainName = "")
     {
         Column.Action = TableBluePrintAlterationAction.AddConstraint;
-        Column.ConstrainQuery = ConstrainQuery;
+        Column.ConstraintQuery = ConstrainQuery;
+        Column.ConstraintName = ConstrainName;
         return this;
     }
     public TableBluePrint RemoveConstraint(String ConstrainName)
     {
         Column.Action = TableBluePrintAlterationAction.RemoveConstraint;
-        Column.ConstrainName = ConstrainName;
+        Column.ConstraintName = ConstrainName;
         return this;
     }
     public TableBluePrint AddForeignKey()
@@ -371,20 +374,6 @@ public class TableBluePrint : BluePrint
     {
         Column.Action = TableBluePrintAlterationAction.RemoveForeignKey;
         Column.RemovedForeignKey = true;
-    }
-    public TableBluePrint LessThan(dynamic Value)
-    {
-        if (!IsNumeric(Value.ToString()))
-            throw new ArgumentException("Min Value Must Be a Number!");
-        Column.MinValue = Value;
-        return this;
-    }
-    public TableBluePrint MoreThan(dynamic Value)
-    {
-        if (!IsNumeric(Value.ToString()))
-            throw new ArgumentException("Max Value Must Be a Number!");
-        Column.MaxValue = Value;
-        return this;
     }
     #endregion
     #endregion
@@ -405,8 +394,8 @@ public class ColumnBluePrint
     public decimal? MinValue { get; set; }
     public decimal? MaxValue { get; set; }
     public String ColumnRename { get; set; }
-    public String ConstrainQuery { get; set; }
-    public String ConstrainName { get; set; }
+    public String ConstraintQuery { get; set; }
+    public String ConstraintName { get; set; }
     public Boolean RemovedForeignKey { get; set; }
     public TableBluePrintAlterationAction? Action { get; set; }
     public ColumnBluePrint()

@@ -82,10 +82,10 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
             if (Column.Action == TableBluePrintAlterationAction.CreateColumn) Transcript += CreateColumn(Column, TableBluePrint.TableName);
             if (Column.Action == TableBluePrintAlterationAction.AlterColumnName) Transcript += RenameColumn(Column, TableBluePrint.TableName);
             //if (Column.Action == TableBluePrintAlterationAction.AlterColumnType) Transcript += AlterColumnType(Column, TableBluePrint.TableName);
-            //if(Column.Action == TableBluePrintAlterationAction.AddForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.AddForeignKey) Transcript += ForeignKey(Column, TableBluePrint.TableName);
             //if(Column.Action == TableBluePrintAlterationAction.RemoveForeignKey) Transcript += RenameColumn(Column, TableBluePrint.TableName);
-            //if(Column.Action == TableBluePrintAlterationAction.AddConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
-            //if(Column.Action == TableBluePrintAlterationAction.RemoveConstraint) Transcript += RenameColumn(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.AddConstraint) Transcript += AddConstraint(Column, TableBluePrint.TableName);
+            if (Column.Action == TableBluePrintAlterationAction.RemoveConstraint) Transcript += RemoveConstraint(Column, TableBluePrint.TableName);
         }
     }
     public String CreateColumn(ColumnBluePrint Column, String TableName)
@@ -123,6 +123,24 @@ internal class SqlServerTableTranscriber : TableTranscriber, ITableTranscriber
     public String AlterColumnType(ColumnBluePrint Column, String TableName)
     {
         return "";
+    }
+    public String ForeignKey(ColumnBluePrint Column, String TableName)
+    {
+        return $"Alter Table {TableName}" + "\n\t" +
+            $"Add {ForeignKeySection(TableName, Column)}\n\n";
+    }
+    public String AddConstraint(ColumnBluePrint Column, String TableName)
+    {
+        Int64 CurrentTick = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
+        if (Column.ConstraintName == "")
+            Column.ConstraintName = TableName + "_" + CurrentTick;
+        return $"Alter Table {TableName}" + "\n\t" +
+            $"Add Constraint {Column.ConstraintName} Check ({Column.ConstraintQuery})\n\n";
+    }
+    public String RemoveConstraint(ColumnBluePrint Column, String TableName)
+    {
+        return $"Alter Table {TableName}" + "\n\t" +
+            $"Drop Constraint {Column.ConstraintName}\n\n";
     }
     #endregion
     #region Drop
