@@ -12,16 +12,17 @@ namespace Ember.Transcription;
 public class Transcriber
 {
     public DataSchema Schema { get; set; }
-    public DatabaseProviderEnum DatabaseProvider { get; set; }
+    private ITranscriber? RDBMSTranscriber { get; set; }
     public Transcriber(DataSchema Schema)
     {
         this.Schema = Schema;
-        this.DatabaseProvider = Schema.DatabaseProvider;
     }
-    public String Transcribe()
+    public String? Transcribe()
     {
-        if (DatabaseProvider == DatabaseProviderEnum.SqlServer) return new SqlServerTranscriber().Transcribe(Schema);
-        if (DatabaseProvider == DatabaseProviderEnum.PostgreSql) return new PostgreSqlTranscriber().Transcribe(Schema);
-        return null!;
+        if (Schema.DatabaseProvider == DatabaseProviderType.SqlServer) RDBMSTranscriber = new SqlServerTranscriber();
+        else if (Schema.DatabaseProvider == DatabaseProviderType.PostgreSql) RDBMSTranscriber = new PostgreSqlTranscriber();
+        else return null;
+
+        return RDBMSTranscriber.Transcribe(Schema);
     }
 }

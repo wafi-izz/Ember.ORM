@@ -10,7 +10,7 @@ using static Ember.DataSchemaManager.DataSchemas.TableSchema;
 
 namespace Ember.DataSchemaManager.DataSchemas;
 
-public enum DatabaseProviderEnum
+public enum DatabaseProviderType
 {
     SQL,
     SqlServer,
@@ -24,15 +24,15 @@ public class DataSchema
     public TableSchema TableSchema { get; set; }
     //Database Informations
     public String ConnectionName { get; set; }
-    public String DatabaseScript { get; set; }
+    public String? DatabaseScript { get; set; }
     public String DatabaseVersion { get; set; } = "1.0"; //TODO: a global variable to control versions. maybe it should be across all DBs
-    public DatabaseProviderEnum DatabaseProvider { get; set; }
+    public DatabaseProviderType DatabaseProvider { get; set; }
     public DataSchema(String ConnectionName)
     {
-        if (ConfigurationManager.ConnectionStrings[ConnectionName] == null) throw new Exception("not found Connection String");
-        if (!Enum.IsDefined(typeof(DatabaseProviderEnum), ConfigurationManager.ConnectionStrings[ConnectionName].ProviderName)) throw new Exception("not found Provider Name");
+        if (ConfigurationManager.ConnectionStrings[ConnectionName] == null) throw new ArgumentException("not found Connection String");
+        if (!Enum.IsDefined(typeof(DatabaseProviderType), ConfigurationManager.ConnectionStrings[ConnectionName].ProviderName)) throw new ArgumentException("not found Provider Name");
         this.ConnectionName = ConnectionName;
-        this.DatabaseProvider = (DatabaseProviderEnum)Enum.Parse(typeof(DatabaseProviderEnum), ConfigurationManager.ConnectionStrings[ConnectionName].ProviderName, true);
+        this.DatabaseProvider = (DatabaseProviderType)Enum.Parse(typeof(DatabaseProviderType), ConfigurationManager.ConnectionStrings[ConnectionName].ProviderName, true);
         this.TableSchema = new TableSchema();
     }
     public void Create(String TableName, TableBluePrintCallBack TableBluePrint)

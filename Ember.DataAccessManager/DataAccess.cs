@@ -16,7 +16,7 @@ using System.Transactions;
 
 namespace Ember.DataAccessManager;
 
-public enum DatabaseProviderEnum
+public enum DatabaseProviderType
 {
     SQL,
     SqlServer,
@@ -27,7 +27,7 @@ public enum DatabaseProviderEnum
 public class DataAccess
 {
     public DataConnection Connection { get; set; }
-    public DataCommand Command { get; set; }
+    public DataCommand? Command { get; set; }
     public String? CommandString { get; set; }
     public dynamic? ReaderData { get; set; }
     public DataTable DataTable { get; set; }
@@ -145,15 +145,15 @@ public class DataConnection
     public SQLiteConnection? SQLiteConnection { get; set; }
     public DataConnection(ConnectionStringManager DataConnections)
     {
-        if (DataConnections.Provider == DatabaseProviderEnum.SqlServer.ToString()) MSSQLConnection = new SqlConnection(DataConnections.CS);
-        if (DataConnections.Provider == DatabaseProviderEnum.PostgreSql.ToString()) PostgreSQLConnection = new NpgsqlConnection(DataConnections.CS);
-        if (DataConnections.Provider == DatabaseProviderEnum.MySql.ToString()) MySQLConnection = new MySqlConnection(DataConnections.CS);
-        if (DataConnections.Provider == DatabaseProviderEnum.Sqlite.ToString()) SQLiteConnection = new SQLiteConnection(DataConnections.CS);
+        if (DataConnections.Provider == DatabaseProviderType.SqlServer.ToString()) MSSQLConnection = new SqlConnection(DataConnections.CS);
+        if (DataConnections.Provider == DatabaseProviderType.PostgreSql.ToString()) PostgreSQLConnection = new NpgsqlConnection(DataConnections.CS);
+        if (DataConnections.Provider == DatabaseProviderType.MySql.ToString()) MySQLConnection = new MySqlConnection(DataConnections.CS);
+        if (DataConnections.Provider == DatabaseProviderType.Sqlite.ToString()) SQLiteConnection = new SQLiteConnection(DataConnections.CS);
 
-        if (DataConnections.Provider == DatabaseProviderEnum.SqlServer.ToString()) Connection = typeof(SqlConnection);
-        if (DataConnections.Provider == DatabaseProviderEnum.PostgreSql.ToString()) Connection = typeof(NpgsqlConnection);
-        if (DataConnections.Provider == DatabaseProviderEnum.MySql.ToString()) Connection = typeof(MySqlConnection);
-        if (DataConnections.Provider == DatabaseProviderEnum.Sqlite.ToString()) Connection = typeof(SQLiteConnection);
+        if (DataConnections.Provider == DatabaseProviderType.SqlServer.ToString()) Connection = typeof(SqlConnection);
+        if (DataConnections.Provider == DatabaseProviderType.PostgreSql.ToString()) Connection = typeof(NpgsqlConnection);
+        if (DataConnections.Provider == DatabaseProviderType.MySql.ToString()) Connection = typeof(MySqlConnection);
+        if (DataConnections.Provider == DatabaseProviderType.Sqlite.ToString()) Connection = typeof(SQLiteConnection);
 
     }
     public void Open()

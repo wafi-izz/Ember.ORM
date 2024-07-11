@@ -8,10 +8,10 @@ using System.Threading.Tasks;
 
 namespace Ember.Transcription.RDBMS.PostgreSql;
 
-internal class PostgreSqlTranscriber
+internal class PostgreSqlTranscriber : ITranscriber
 {
     internal PostgreSqlTranscriber() { }
-    internal String Transcribe(DataSchema Schema)
+    public String Transcribe(DataSchema Schema)
     {
         return new PostgreSqlTableTranscriber(Schema.TableSchema).Transcript;
     }
