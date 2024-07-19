@@ -3,6 +3,7 @@ using Ember.DataSchemaManager.Dictionaries;
 using Ember.DataSchemaManager.ObjectTypes;
 using Ember.DataSchemaManager.BluePrints;
 using Ember.DataStructure.Database;
+using static Ember.DataSchemaManager.DataSchemas.TableSchema;
 
 namespace Ember.DataStructure.Migrations.M_02_Tables;
 public class T_01_ObjectTypes : Table, IMigratablesDictionary
@@ -10,7 +11,7 @@ public class T_01_ObjectTypes : Table, IMigratablesDictionary
     public String TableName { get; set; }
     public T_01_ObjectTypes()
     {
-        TableName = ExtractObjectName(this.GetType().Name);
+        TableName = ExtractObjectName(this.GetType().Name); 
     }
     public void Up()
     {

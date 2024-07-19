@@ -10,7 +10,7 @@ namespace Ember.DataSchemaManager.DataSchemas;
 
 public class TableSchema
 {
-    public ObservableCollection<TableBluePrint> TableBluePrintList { get; set; }
+    public ObservableCollection<TableBluePrint> TableBluePrintList { get; }
     public ObservableCollection<String> TableList { get; }
     public TableSchema(ObservableCollection<String> TableList)
     {
@@ -31,7 +31,7 @@ public class TableSchema
         TableBluePrint TableBluePrint = new TableBluePrint();
         TableBluePrint.Action = BluePrintAction.Create;
         TableBluePrint.ObjectName = TableName;
-        TableBluePrintCallBack.Invoke(TableBluePrint);
+        TableBluePrintCallBack?.Invoke(TableBluePrint);
         TableBluePrint.Compose();
         TableBluePrintList.Add(TableBluePrint);
     }
@@ -41,7 +41,7 @@ public class TableSchema
         TableBluePrint.Action = BluePrintAction.Alter;
         TableBluePrint.ObjectName = TableName;
         TableBluePrint.ObjectRename = TableRename;
-        TableBluePrintCallBack.Invoke(TableBluePrint);
+        TableBluePrintCallBack?.Invoke(TableBluePrint);
         TableBluePrint.Compose();
         TableBluePrintList.Add(TableBluePrint);
     }

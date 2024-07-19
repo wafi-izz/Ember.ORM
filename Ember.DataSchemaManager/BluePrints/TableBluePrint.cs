@@ -1,6 +1,8 @@
-﻿using Org.BouncyCastle.Tls;
+﻿using Microsoft.VisualBasic;
+using Org.BouncyCastle.Tls;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Numerics;
 using System.Text;
@@ -55,12 +57,13 @@ public class TableBluePrint : BluePrint
     }
     private ColumnBluePrint Column { get; set; }
     private Boolean ColumnInitRequired { get; set; }
-    public List<ColumnBluePrint> ColumnList { get; set; }
+    public Collection<ColumnBluePrint> ColumnList { get; }
 
     public TableBluePrint()
     {
         ColumnInitRequired = true;
-        ColumnList = new List<ColumnBluePrint>();
+        ColumnList = new Collection<ColumnBluePrint>();
+        Column = new ColumnBluePrint();
     }
     public void Compose()
     {
@@ -74,15 +77,9 @@ public class TableBluePrint : BluePrint
             return;
         }
 
-        if (Column != null)
-        {
-            ColumnList.Add(Column);
-            Column = new ColumnBluePrint();
-        }
-        else
-        {
-            Column = new ColumnBluePrint();
-        }
+        if (Column?.ColumnName != null)
+            ColumnList.Add(Column); 
+        Column = new ColumnBluePrint();
     }
     public void RowStatement(String Statement)
     {
@@ -382,7 +379,7 @@ public class TableBluePrint : BluePrint
 public class ColumnBluePrint
 {
     public String Statement { get; set; }
-    public String ColumnName { get; set; }
+    public String? ColumnName { get; set; }
     public JsonObject ColumnDataType { get; } //NOTE: there an element name "DataTypeSQLName" it is used to distinguish between the different naming across the providers.
     public Boolean IsPrimaryKey { get; set; }
     public Boolean IsIdentity { get; set; }
