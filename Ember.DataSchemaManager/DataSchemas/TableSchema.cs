@@ -44,7 +44,6 @@ public class TableSchema
         TableBluePrintCallBack?.Invoke(TableBluePrint);
         TableBluePrint.Compose();
         TableBluePrintList.Add(TableBluePrint);
-        //b
     }
     public void Drop(String TableName)
     {
