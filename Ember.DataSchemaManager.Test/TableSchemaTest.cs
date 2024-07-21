@@ -3,9 +3,9 @@ using NUnit.Framework;
 using Ember.DataSchemaManager.DataSchemas;
 using Ember.DataSchemaManager.BluePrints;
 using static Ember.DataSchemaManager.DataSchemas.TableSchema;
+using Newtonsoft.Json.Linq;
 
 namespace Ember.DataSchemaManager.Test;
-
 
 [TestFixture]
 public class TableSchemaTest
@@ -23,10 +23,14 @@ public class TableSchemaTest
         TableSchema?.Create(TableName, Table =>
         {
             Table.Integer("ObjectTypeID").PrimaryKey().Identity().Min(1).Max(100);
-            Table.Integer("DD").ForeignKey().References("ObjectTypeID").On("ObjectTypes").Constraint("some_custom_name");
+            Table.String("ObjectName",500);
         });
         Boolean TableBluePrintExists = TableSchema?.TableBluePrintList.Count == 1;
-        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.Count > 0; //TODO: Test the ColumnList Thoroughly 
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.Count > 0;
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.First().ColumnName == "ObjectTypeID";
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.First().ColumnDataType["DataTypeName"]!.ToString() == "Integer";
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList[1].ColumnName == "ObjectName";
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList[1].ColumnDataType["DataTypeName"]!.ToString() == "String";
         TableBluePrintExists &= TableSchema?.TableBluePrintList.First().Action == BluePrintAction.Create;
         Assert.That(TableBluePrintExists, Is.True);
     }
@@ -35,9 +39,18 @@ public class TableSchemaTest
     {
         String TableName = "Table1";
         String TableReName = "Table1";
-        TableSchema?.Alter(TableName,TableReName, Table => { });
+        TableSchema?.Alter(TableName,TableReName, Table =>
+        {
+            Table.AlterColumn("ObjectTypeID").Rename("NameColumnName");
+            Table.AlterColumn("ObjectTypeID").AddConstraint("1=1", "ccc");
+        });
         Boolean TableBluePrintExists = TableSchema?.TableBluePrintList.Count == 1;
-        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.Count > 0; //TODO: Test the ColumnList Thoroughly 
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.Count > 0;
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.First().ColumnRename == "NameColumnName";
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList.First().Action == TableBluePrintAlterationAction.AlterColumnName;
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList[1].ColumnName == "ObjectTypeID";
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList[1].Action == TableBluePrintAlterationAction.AddConstraint;
+        TableBluePrintExists &= TableSchema?.TableBluePrintList.First().ColumnList[1].ConstraintName == "ccc";
         TableBluePrintExists &= TableSchema?.TableBluePrintList.First().Action == BluePrintAction.Alter;
         Assert.That(TableBluePrintExists, Is.True);
     }
@@ -85,8 +98,7 @@ public class CalculatorTests
         int result = calculator.Add(5, 3);
 
         // Assert: Verify the result
-        //ClassicAssert.AreEqual(8, result);
-        Assert.Fail();
+        ClassicAssert.AreEqual(8, result);
     }
 
     [Test]
